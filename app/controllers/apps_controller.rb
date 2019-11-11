@@ -48,11 +48,16 @@ class AppsController < ApplicationController
           HEREDOC
         end
 
-        Docker::Image.build_from_dir('.')
+        `docker-machine create \
+        --driver digitalocean \
+        --digitalocean-access-token #{ENV["ACCESS_TOKEN"]} \
+        do-sandbox`
 
-        # create docker image from code
-          # unzip the code file
-        # user docker-machine to deploy image to new do droplete
+        output = `eval $(docker-machine env do-sandbox); docker build -t sinatra-app .; docker run -d -p 80:4567 sinatra-app`
+        ip = `docker-machine ip do-sandbox`
+        @app.ip_address = ip
+        @app.save
+
         format.html { redirect_to @app, notice: 'App was successfully created.' }
         format.json { render :show, status: :created, location: @app }
       else

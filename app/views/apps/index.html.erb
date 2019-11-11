@@ -6,6 +6,7 @@
   <thead>
     <tr>
       <th>Title</th>
+      <th>IP Address</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -14,6 +15,11 @@
     <% @apps.each do |app| %>
       <tr>
         <td><%= app.title %></td>
+        <td>
+          <a href="http://<%= app.ip_address %>" target="_blank">
+            <%= app.ip_address %>
+          </a>
+        </td>
         <td><%= link_to 'Show', app %></td>
         <td><%= link_to 'Edit', edit_app_path(app) %></td>
         <td><%= link_to 'Destroy', app, method: :delete, data: { confirm: 'Are you sure?' } %></td>

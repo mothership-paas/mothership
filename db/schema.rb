@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_10_225027) do
+ActiveRecord::Schema.define(version: 2019_11_11_191123) do
 
   create_table "apps", force: :cascade do |t|
     t.string "title"
@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2019_11_10_225027) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "path"
     t.string "filename"
+    t.string "ip_address"
   end
 
 end
