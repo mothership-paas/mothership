@@ -1,6 +1,19 @@
-<h1>Editing App</h1>
+<div class="columns is-centered">
+  <div class="column is-half">
+    <% if notice %>
+      <article class="message is-success">
+        <div class="message-body">
+          <%= notice %>
+        </div>
+      </article>
+    <% end %>
 
-<%= render 'form', app: @app %>
+    <div class="box">
+      <h1 class="subtitle">Edit App</h1>
 
-<%= link_to 'Show', @app %> |
-<%= link_to 'Back', apps_path %>
+      <%= render 'form', app: @app %>
+      <br/>
+      or <%= link_to 'Go back', apps_path %>
+    </div>
+  </div>
+</div>
