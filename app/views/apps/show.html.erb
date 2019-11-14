@@ -1,16 +1,30 @@
-<p id="notice"><%= notice %></p>
+<div class="columns is-centered">
+  <div class="column is-half">
+    <% if notice %>
+      <article class="message is-success">
+        <div class="message-body">
+          <%= notice %>
+        </div>
+      </article>
+    <% end %>
 
-<p>
-  <strong>Title:</strong>
-  <%= @app.title %>
-</p>
+    <div class="box">
+      <div class="content">
+        <p>
+          <strong>Title:</strong>
+          <%= @app.title %>
+        </p>
 
-<p>
-  <strong>IP Address:</strong>
-  <a href=<%= "http://" + @app.ip_address %> target="_blank">
-    <%= @app.ip_address %>
-  </a>
-</p>
+        <p>
+          <strong>IP Address:</strong>
+          <a href=<%= "http://" + @app.ip_address %> target="_blank">
+            <%= @app.ip_address %>
+          </a>
+        </p>
+      </div>
 
-<%= link_to 'Edit', edit_app_path(@app) %> |
-<%= link_to 'Back', apps_path %>
+      <%= link_to 'Edit', edit_app_path(@app), class: 'button is-link' %>
+      <%= link_to 'Back', apps_path, class: 'button' %>
+    </div>
+  </div>
+</div>

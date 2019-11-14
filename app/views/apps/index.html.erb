@@ -1,33 +1,38 @@
-<p id="notice"><%= notice %></p>
+<% if notice %>
+  <p id="notice"><%= notice %></p>
+<% end %>
 
-<h1>Apps</h1>
+<div class="columns">
+  <div class="column">
+      <h1 class="subtitle">
+        <%= @apps.length %> app(s)
+        <%= link_to 'New App', new_app_path, class: 'button is-link is-pulled-right' %>
+      </h1>
+    <div class="box">
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>IP Address</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
+      <table class="table is-hoverable is-fullwidth">
+        <tbody>
+          <% @apps.each do |app| %>
+            <tr>
+              <td>
+                <%= link_to "#{app.title}", app_path(app) %>
+              </td>
+              <td>
+                <a href="http://<%= app.ip_address %>" target="_blank">
+                  <%= app.ip_address %>
+                </a>
+              </td>
+              <td>
+                <div class="buttons are-small is-pulled-right">
+                <%= link_to 'Edit', edit_app_path(app), class: 'button is-light' %>
+                <%= link_to 'Destroy', app, method: :delete, data: { confirm: 'Are you sure?' }, class: 'button is-danger is-light' %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
 
-  <tbody>
-    <% @apps.each do |app| %>
-      <tr>
-        <td><%= app.title %></td>
-        <td>
-          <a href="http://<%= app.ip_address %>" target="_blank">
-            <%= app.ip_address %>
-          </a>
-        </td>
-        <td><%= link_to 'Show', app %></td>
-        <td><%= link_to 'Edit', edit_app_path(app) %></td>
-        <td><%= link_to 'Destroy', app, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New App', new_app_path %>
+    </div>
+  </div>
+</div>
