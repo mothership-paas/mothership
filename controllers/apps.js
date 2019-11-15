@@ -38,7 +38,7 @@ const buildDockerfile = (file) => {
   return (app) => {
     return new Promise((resolve, reject) => {
       console.log('Building Dockerfile...')
-      fs.writeFileSync('./Dockerfile', dockerfileContent(file));
+      fs.writeFileSync(`./${file.destination}/Dockerfile`, dockerfileContent(file));
       resolve(app);
     });
   };

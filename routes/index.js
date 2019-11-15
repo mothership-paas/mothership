@@ -1,11 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const appsController = require('../controllers/apps');
 const multer  = require('multer');
+const fs = require('fs');
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, './uploads'),
+  destination: (req, file, cb) => {
+    const directoryName = `./uploads/${Date.now()}`;
+    fs.access(directoryName, null, (err) => {
+      if (err) {
+        fs.mkdir(directoryName, (err) => {
+          if (err) { throw err }
+          cb(null, directoryName);
+        })
+      }
+    })
+  },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, file.originalname);
   }
 });
 
