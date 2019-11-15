@@ -6,11 +6,6 @@ const machine = new Machine();
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const CREATE_DROPLET_COMMAND = `docker-machine create \
---driver digitalocean \
---digitalocean-access-token ${process.env.ACCESS_TOKEN} \
-do-sandbox`;
-
 const BUILD_RUN_CONTAINER_COMMMAND = `eval $(docker-machine env do-sandbox);\
 docker build -t sinatra-app .;\
 docker run -d -p 80:4567 sinatra-app`;
@@ -28,9 +23,18 @@ CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "4567"]`;
 
 const buildDroplet = (app) => {
   return new Promise((resolve, reject) => {
-    console.log('Building droplet...')
-    execSync(CREATE_DROPLET_COMMAND); // This uses the sync version of exec. TODO: Switch to async once we have bg jobs
-    resolve(app);
+    console.log('Building droplet...');
+
+    const options = {
+      'digitalocean-access-token': process.env.ACCESS_TOKEN,
+    };
+
+    Machine.create('do-sandbox', 'digitalocean', options, (err) => {
+      if (err) throw err;
+      resolve(app);
+    }); // Still using sync version. TODO: Switch to async once we have bg jobs
+    
+    
   });
 };
 
