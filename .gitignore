@@ -60,9 +60,8 @@ typings/
 # next.js build output
 .next
 
-# Uploaded files
-uploads/*
-
 # Generated Files
 public/stylesheets/style.css
 public/stylesheets/style.css.map
+
+
