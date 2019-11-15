@@ -54,10 +54,14 @@ const buildAndRunContainer = (app) => {
 
 const saveIpAddress = (app) => {
   return new Promise((resolve, reject) => {
-    console.log('Getting the IP Address of droplet...');
-    const ipAddress = execSync('docker-machine ip do-sandbox', { encoding: "utf8" }).trim();
-    console.log('Saving the IP Address of the droplet...');
-    app.update({ ipAddress }).then((app) => resolve(app));
+    const machine = new Machine('do-sandbox');
+
+    machine.inspect((err, result) => {
+      if (err) throw err;
+
+      const ipAddress = result.driver.ipAddress;
+      app.update({ ipAddress }).then((app) => resolve(app));
+    });
   });
 };
 
