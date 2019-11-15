@@ -1,4 +1,8 @@
 const App = require('../server/models').App;
+const Docker = require('dockerode');
+const Machine = require('docker-machine');
+const cmd = process.argv.slice(2);
+const machine = new Machine();
 const { execSync } = require('child_process');
 const fs = require('fs');
 
