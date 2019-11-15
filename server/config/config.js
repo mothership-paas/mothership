@@ -1,4 +1,9 @@
-require('dotenv').config();
+// We need to require dotenv here because sequelize uses this file
+// without the context of our app, which normally already would have
+// used dotenv to set up environment variables
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  require('dotenv').config();
+}
 
 module.exports = {
   development: {
