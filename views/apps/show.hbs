@@ -1,0 +1,24 @@
+<div class="columns is-centered">
+  <div class="column is-half">
+
+    <div class="box">
+      <div class="content">
+        <p>
+          <strong>Title:</strong>
+          {{ app.title }}
+        </p>
+
+        <p>
+          <strong>IP Address:</strong>
+          <a href="http://{{ app.ipAddress }}" target="_blank">
+            {{ app.ipAddress }}
+          </a>
+
+        </p>
+      </div>
+
+      <a href='' class='button is-link'>Edit</a>
+      <a href='/apps' class='button'>Back</a>
+    </div>
+  </div>
+</div>
