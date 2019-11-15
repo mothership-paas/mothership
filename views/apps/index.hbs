@@ -1,0 +1,32 @@
+<div class="columns">
+  <div class="column">
+      <h1 class="subtitle">
+        {{apps.length}} app(s)
+        <a href="/apps/new" class="button is-link is-pulled-right">Create App</a>
+      </h1>
+    <div class="box">
+
+      <table class="table is-hoverable is-fullwidth">
+        {{#each apps}}
+          </tr>
+            <td>
+              <a href="/apps/{{ id }}">{{title}}</a>
+            </td>
+            <td>
+              <a href="http://{{ipAddress}}" target="_blank">
+                {{ipAddress}}
+              </a>
+            </td>
+            <td>
+              <div class="buttons are-small is-pulled-right">
+                <a href="/apps/edit/{{ id }}" class="button is-light">Edit</a>
+                <a class="button is-danger is-light">Delete (NYI)</a>
+              </div>
+            </td>
+          </tr>
+        {{/each}}
+      </table>
+
+    </div>
+  </div>
+</div>

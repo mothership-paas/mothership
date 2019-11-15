@@ -1,0 +1,30 @@
+<div class="columns is-centered">
+  <div class="column is-half">
+
+    <div class="box">
+      <h1 class="subtitle">New App</h1>
+
+      <form method="POST" action="/apps" enctype="multipart/form-data">
+        <div class="field">
+          <label>Title</label>
+
+          <div class="control">
+            <input type="text" name="title" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>File</label>
+
+          <div class="control">
+            <input type="file" name="file" />
+          </div>
+        </div>
+
+        <input type="submit" class="button is-link" />
+        or
+        <a href="/apps">Go back</a>
+      </form>
+    </div>
+  </div>
+</div>
