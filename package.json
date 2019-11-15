@@ -9,6 +9,8 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "docker-machine": "^3.0.1",
+    "dockerode": "^3.0.2",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
     "hbs": "~4.0.4",
