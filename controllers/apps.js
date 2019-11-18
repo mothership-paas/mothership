@@ -9,10 +9,6 @@ const fs = require('fs');
 var path = require('path');
 var appDir = path.dirname(require.main.filename);
 
-const BUILD_RUN_CONTAINER_COMMMAND = `eval $(docker-machine env do-sandbox);\
-docker build -t sinatra-app .;\
-docker run -d -p 80:4567 sinatra-app`;
-
 const dockerfileContent = ({ filename }) => {
   return `FROM ruby:2.6
 COPY ${filename} /usr/src/app/
