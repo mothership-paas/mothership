@@ -35,7 +35,7 @@ const buildDroplet = (app) => {
     Machine.create('do-sandbox', 'digitalocean', options, (err) => {
       if (err) throw err;
       resolve(app);
-    }); // Still using sync version. TODO: Switch to async once we have bg jobs
+    });
   });
 };
 
