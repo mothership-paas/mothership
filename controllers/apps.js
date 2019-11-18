@@ -36,8 +36,6 @@ const buildDroplet = (app) => {
       if (err) throw err;
       resolve(app);
     }); // Still using sync version. TODO: Switch to async once we have bg jobs
-
-
   });
 };
 
