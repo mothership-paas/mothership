@@ -130,13 +130,14 @@ module.exports = {
 
       console.log(req.file);
 
-      return App.create(app)
+      App.create(app)
         .then(buildDroplet)
         .then(buildDockerfile(req.file))
         .then(buildAndRunContainer)
         .then(saveIpAddress)
-        .then(app => { res.redirect(`/apps/${app.id}`) })
         .catch(error => res.status(400).send(error));
+
+      return res.redirect(`/apps`)
     });
   },
 
