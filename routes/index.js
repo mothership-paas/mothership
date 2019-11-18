@@ -1,11 +1,18 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const appsController = require('../controllers/apps');
 const multer  = require('multer');
+const fs = require('fs');
+const uuid = require('uuid/v1');
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, './uploads'),
+  // TODO: validate that the file is a zip
+  destination: (req, file, cb) => {
+    const directoryName = `./tmp/`;
+    cb(null, directoryName);
+  },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, uuid() + '.zip');
   }
 });
 
