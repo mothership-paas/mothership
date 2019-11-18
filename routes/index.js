@@ -3,21 +3,16 @@ const router = express.Router();
 const appsController = require('../controllers/apps');
 const multer  = require('multer');
 const fs = require('fs');
+const uuid = require('uuid/v1');
 
 const storage = multer.diskStorage({
+  // TODO: validate that the file is a zip
   destination: (req, file, cb) => {
-    const directoryName = `./uploads/${Date.now()}`;
-    fs.access(directoryName, null, (err) => {
-      if (err) {
-        fs.mkdir(directoryName, (err) => {
-          if (err) { throw err }
-          cb(null, directoryName);
-        })
-      }
-    })
+    const directoryName = `./tmp/`;
+    cb(null, directoryName);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, uuid() + '.zip');
   }
 });
 
