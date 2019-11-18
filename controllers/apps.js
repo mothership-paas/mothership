@@ -10,6 +10,7 @@ const path = require('path');
 const appDir = path.dirname(require.main.filename);
 const uuidv1 = require('uuid/v1')
 const slugify = require('slugify');
+const tar = require('tar-fs');
 
 const dockerfileContent = ({ filename }) => {
   return `FROM ruby:2.6
@@ -51,10 +52,8 @@ const buildAndRunContainer = (app) => {
   return new Promise(async (resolve, reject) => {
     console.log('Building + running container on droplet...');
     const machine = new Machine(app.dropletName);
-    console.log(app.dropletName);
 
     machine.env({ parse: true }, (err, result) => {
-      console.log('finished getting environment');
       const certPath = result.DOCKER_CERT_PATH;
       const hostWithPort = result.DOCKER_HOST.split('//')[1];
       const host = hostWithPort.split(':')[0];
@@ -71,32 +70,31 @@ const buildAndRunContainer = (app) => {
 
       const docker = new Docker(options);
 
-      docker.buildImage({
-        context: app.path,
-          src: ['Dockerfile', app.filename]
-        }, {
-          t: app.title + ':latest'
-        }, function(error, output) {
-          console.log('build image callback');
-          if (error) { return console.error(error); }
-          output.pipe(process.stdout);
-          output.on('end', function () {
-            // send notification to client that build is ready
-            var container = docker.createContainer({
-              Image: app.title + ':latest',
-              PortBindings: { "4567/tcp": [{ HostPort: "80" }] }
-            }).then(container => {
-              return container.start();
-            }).then(container => {
-              resolve(app);
-            }).catch(error => {
-              throw error;
-            });
+      var tarStream = tar.pack(app.path);
+      docker.buildImage(tarStream, {
+        t: `${app.title}:latest`,
+      }, function(error, output) {
+        if (error) {
+          return console.error(error);
+        }
+        output.pipe(process.stdout);
+        output.on('end', function () {
+          // send notification to client that build is ready
+          var container = docker.createContainer({
+            Image: app.title + ':latest',
+            PortBindings: { "4567/tcp": [{ HostPort: "80" }] }
+          }).then(container => {
+            return container.start();
+          }).then(container => {
+            resolve(app);
+          }).catch(error => {
+            throw error;
           });
+        });
       });
     });
   });
-};
+}
 
 const saveIpAddress = (app) => {
   return new Promise((resolve, reject) => {
