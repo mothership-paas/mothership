@@ -35,9 +35,7 @@ const buildDroplet = (app) => {
     Machine.create('do-sandbox', 'digitalocean', options, (err) => {
       if (err) throw err;
       resolve(app);
-    }); // Still using sync version. TODO: Switch to async once we have bg jobs
-    
-    
+    });
   });
 };
 
@@ -101,11 +99,14 @@ const buildAndRunContainer = (app) => {
 
 const saveIpAddress = (app) => {
   return new Promise((resolve, reject) => {
-    console.log('Getting the IP Address of droplet...');
-    const ipAddress = execSync('docker-machine ip do-sandbox', { encoding: "utf8" }).trim();
-    console.log('Saving the IP Address of the droplet...');
-    app.update({ ipAddress }).then((app) => resolve(app));
-    resolve(app);
+    const machine = new Machine('do-sandbox');
+
+    machine.inspect((err, result) => {
+      if (err) throw err;
+
+      const ipAddress = result.driver.ipAddress;
+      app.update({ ipAddress }).then((app) => resolve(app));
+    });
   });
 };
 
