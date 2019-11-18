@@ -6,8 +6,10 @@ const machine = new Machine();
 const docker = new Docker();
 const { execSync } = require('child_process');
 const fs = require('fs');
-var path = require('path');
-var appDir = path.dirname(require.main.filename);
+const path = require('path');
+const appDir = path.dirname(require.main.filename);
+const uuidv1 = require('uuid/v1')
+const slugify = require('slugify');
 
 const dockerfileContent = ({ filename }) => {
   return `FROM ruby:2.6
@@ -28,7 +30,7 @@ const buildDroplet = (app) => {
       'digitalocean-access-token': process.env.ACCESS_TOKEN,
     };
 
-    Machine.create('do-sandbox', 'digitalocean', options, (err) => {
+    Machine.create(app.dropletName, 'digitalocean', options, (err) => {
       if (err) throw err;
       resolve(app);
     });
@@ -47,10 +49,12 @@ const buildDockerfile = (file) => {
 
 const buildAndRunContainer = (app) => {
   return new Promise(async (resolve, reject) => {
-    console.log('Building + running container on droplet...')
-    const machine = new Machine('do-sandbox');
+    console.log('Building + running container on droplet...');
+    const machine = new Machine(app.dropletName);
+    console.log(app.dropletName);
 
     machine.env({ parse: true }, (err, result) => {
+      console.log('finished getting environment');
       const certPath = result.DOCKER_CERT_PATH;
       const hostWithPort = result.DOCKER_HOST.split('//')[1];
       const host = hostWithPort.split(':')[0];
@@ -73,6 +77,7 @@ const buildAndRunContainer = (app) => {
         }, {
           t: app.title + ':latest'
         }, function(error, output) {
+          console.log('build image callback');
           if (error) { return console.error(error); }
           output.pipe(process.stdout);
           output.on('end', function () {
@@ -95,7 +100,7 @@ const buildAndRunContainer = (app) => {
 
 const saveIpAddress = (app) => {
   return new Promise((resolve, reject) => {
-    const machine = new Machine('do-sandbox');
+    const machine = new Machine(app.dropletName);
 
     machine.inspect((err, result) => {
       if (err) throw err;
@@ -121,7 +126,8 @@ module.exports = {
       const app = {
         title: req.body.title,
         path: `uploads/${req.body.title}`,
-        filename: req.file.filename
+        filename: req.file.filename,
+        dropletName: `${slugify(req.body.title)}-${uuidv1()}`,
       };
 
       console.log(req.file);
