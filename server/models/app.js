@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     ipAddress: DataTypes.STRING,
     dropletName: DataTypes.STRING,
     network: DataTypes.STRING,
+    subdomain: DataTypes.STRING,
   }, {});
 
   App.associate = function(models) {
