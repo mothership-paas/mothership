@@ -21,7 +21,7 @@ module.exports = {
         title: req.body.title,
         path: `uploads/${req.body.title}`,
         filename: req.file.filename,
-        dropletName: `${slugify(req.body.title)}-${uuidv1()}`,
+        network: `${req.body.title}_default`
       };
 
       App.create(app)
@@ -79,5 +79,13 @@ module.exports = {
           .catch((error) => res.status(400).send(error))
       })
       .catch(error => res.status(400).send(error));
+  },
+
+  createDatabase(req, res) {
+    App.findByPk(req.params.appId)
+      .then(DockerWrapper.createDatabase)
+      .then(DockerWrapper.setDatabaseEnvVariablesForApp)
+
+    res.redirect('/apps');
   },
 };
