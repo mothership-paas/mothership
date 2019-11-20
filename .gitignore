@@ -64,4 +64,5 @@ typings/
 public/stylesheets/style.css
 public/stylesheets/style.css.map
 
-
+# Ignore Mac DS_Store files
+.DS_Store
