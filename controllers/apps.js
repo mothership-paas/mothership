@@ -11,7 +11,7 @@ module.exports = {
     fs.mkdir(`uploads/${req.body.title}`, err => {
       fs.rename(
         req.file.path,
-        `uploads/${req.body.title}/${req.file.filename}`,
+        `uploads/${req.body.title}/${req.file.filename}.zip`,
         (err) => {
           if (err) { console.log(err) }
         }
@@ -20,12 +20,12 @@ module.exports = {
       const app = {
         title: req.body.title,
         path: `uploads/${req.body.title}`,
-        filename: req.file.filename,
+        filename: req.file.filename + '.zip',
         network: `${req.body.title}_default`
       };
 
       App.create(app)
-        .then(DockerWrapper.buildDockerfile(req.file))
+        .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
         .then(DockerWrapper.buildImage)
         .then(DockerWrapper.createNetwork)
         .then(DockerWrapper.createService)
@@ -82,9 +82,26 @@ module.exports = {
   },
 
   createDatabase(req, res) {
+    console.log(req.file);
     App.findByPk(req.params.appId)
+      .then((app) => {
+        return new Promise((resolve, reject) => {
+          fs.mkdir(`uploads/${app.title}/db`, err => {
+            if (err) { reject(err); }
+
+            fs.rename(req.file.path, `uploads/${app.title}/db/schema.sql`, (err) => {
+              if (err) { reject(err); }
+              resolve(app);
+            });
+          });
+        });
+      })
       .then(DockerWrapper.createDatabase)
       .then(DockerWrapper.setDatabaseEnvVariablesForApp)
+      .catch(error => {
+        console.log(error);
+        res.status(400).send(error);
+      });
 
     res.redirect('/apps');
   },

@@ -17,7 +17,13 @@
         </p>
 
         <p>
-          <form method="POST" action="/apps/{{ app.id }}/database">
+          Add a database:
+          <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
+            
+            <label>
+              Schema: <input type="file" name="file" />
+            </label>
+
             <input class="button is-link" type="submit" value="Add Database" />
           </form>
         </p>

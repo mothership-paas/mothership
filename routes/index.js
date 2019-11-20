@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     cb(null, directoryName);
   },
   filename: (req, file, cb) => {
-    cb(null, uuid() + '.zip');
+    cb(null, uuid());
   }
 });
 
@@ -31,6 +31,6 @@ router.post('/apps', upload.single('file'), appsController.create);
 router.delete('/apps/:appId', appsController.destroy);
 
 // Database
-router.post('/apps/:appId/database', appsController.createDatabase);
+router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
 
 module.exports = router;
