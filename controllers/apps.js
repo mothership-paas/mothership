@@ -1,5 +1,6 @@
 const DockerWrapper = require('../lib/DockerWrapper');
 const App = require('../server/models').App;
+const Config = require('../server/models').Config;
 
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
@@ -25,6 +26,16 @@ module.exports = {
       };
 
       App.create(app)
+        .then((app) => {
+          // Set app subdomain now that we have id
+          return new Promise(async(resolve, reject) => {
+            const domain = await Config.findOne({
+              where: { key: 'domain' },
+            })
+            await app.update({ url: `${app.title}${app.id}.${domain.value}` });
+            resolve(app);
+          });
+        })
         .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
         .then(DockerWrapper.buildImage)
         .then(DockerWrapper.createNetwork)
