@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     path: DataTypes.STRING,
     filename: DataTypes.STRING,
     network: DataTypes.STRING,
-    subdomain: DataTypes.STRING,
+    url: DataTypes.STRING,
   }, {});
 
   App.associate = function(models) {
