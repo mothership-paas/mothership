@@ -25,16 +25,19 @@ module.exports = {
       };
 
       App.create(app)
+        .then((app) => {
+          res.redirect(`apps/${app.id}?events`);
+          app.emitEvent(`Creating application '${app.title}'`)
+          return app;
+        })
         .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
         .then(DockerWrapper.buildImage)
         .then(DockerWrapper.createNetwork)
         .then(DockerWrapper.createService)
-        .catch(error => {
-          console.log(error);
-          res.status(400).send(error)
-        });      
-
-      return res.redirect(`/apps`)
+        .then((app) => {
+          app.emitEvent('===END===');
+        })
+        .catch(error => { throw error; });
     });
   },
 
