@@ -1,3 +1,12 @@
+<div class="columns is-centered terminal-wrapper" style="display: none">
+  <div class="column is-three-quarters">
+    <details open="true">
+      <summary>Build Process</summary>
+      <pre class="terminal"></pre>
+    </details>
+  </div>
+</div>
+
 <div class="columns is-centered">
   <div class="column is-three-quarters">
 
@@ -35,35 +44,44 @@
   </div>
 </div>
 
-<div class="columns is-centered terminal-wrapper" style="display: none">
-  <div class="column is-three-quarters">
-    <details open="true">
-      <summary>Build Process</summary>
-      <pre class="terminal"></pre>
-    </details>
-  </div>
-</div>
-
 <script>
 (() => {
-  const terminal = document.querySelector('.terminal');
   const terminalWrapper = document.querySelector('.terminal-wrapper');
+  const terminal = document.querySelector('.terminal');
   const url = new URL(document.location.href);
   const urlParams = new URLSearchParams(url.search);
   const showTerminal = urlParams.has('events');
 
   if (showTerminal) {
-    const eventSource = new EventSource('/events/{{ app.id }}');
+    const appEventEndpoint = new EventSource('/events/{{ app.id }}');
 
-    eventSource.addEventListener('message', (event) => {
+    const minimizeTerminal = () => {
+      terminalWrapper.querySelector('details').removeAttribute('open');
+      terminalWrapper.querySelector('summary').innerHTML = 'Build Complete';
+    };
+
+    const messageHandler = (event) => {
+      if (event.lastEventId === '-1') {
+        appEventEndpoint.close();
+        minimizeTerminal();
+        return;
+      }
+
+      // This only unhides the terminal _if_ we get a message from the server.
       if (terminalWrapper.style.display !== 'flex') { terminalWrapper.style.display = 'flex'; }
 
-      terminal.innerHTML += `<p>${event.data}</p>`;
+      const message = JSON.parse(event.data);
+
+      terminal.innerHTML += message;
       terminal.scrollTop = terminal.scrollHeight;
-      if (event.data === '===END===') {
-        eventSource.close();
-      }
-    });
+    };
+
+    const errorHandler = (error) => {
+      appEventEndpoint.close();
+    };
+
+    appEventEndpoint.addEventListener('message', messageHandler);
+    appEventEndpoint.addEventListener('error', errorHandler);
   }
 })();
 </script>
