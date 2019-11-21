@@ -7,8 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     path: DataTypes.STRING,
     filename: DataTypes.STRING,
-    ipAddress: DataTypes.STRING,
-    dropletName: DataTypes.STRING,
     network: DataTypes.STRING,
   }, {});
 
