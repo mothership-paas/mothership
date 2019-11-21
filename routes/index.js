@@ -4,6 +4,7 @@ const appsController = require('../controllers/apps');
 const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
+const eventLogger = require('../lib/EventLogger');
 
 const storage = multer.diskStorage({
   // TODO: validate that the file is a zip
@@ -22,6 +23,9 @@ const upload = multer({storage});
 router.get('/', function(req, res, next) {
   res.redirect('/apps');
 });
+
+// Event Streaming
+router.get('/events/:appId', eventLogger.appEvents);
 
 // App
 router.get('/apps', appsController.list);

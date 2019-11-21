@@ -1,4 +1,6 @@
 'use strict';
+const eventLogger = require('../../lib/EventLogger').eventLogger;
+
 module.exports = (sequelize, DataTypes) => {
 
   const App = sequelize.define('App', {
@@ -17,6 +19,18 @@ module.exports = (sequelize, DataTypes) => {
 
   App.associate = function(models) {
     // associations can be defined here
+  };
+
+  App.prototype.emitEvent = function(message) {
+    console.log(message);
+    eventLogger.emit(`message-${this.id}`, message + '\n');
+  };
+
+  App.prototype.emitStdout = function(data) {
+    const message = JSON.parse(data);
+    if (message.stream) {
+      eventLogger.emit(`message-${this.id}`, message.stream);
+    }
   };
 
   return App;
