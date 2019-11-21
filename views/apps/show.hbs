@@ -1,48 +1,61 @@
-<div class="columns is-centered terminal-wrapper" style="display: none">
+<div class="columns is-centered">
   <div class="column is-three-quarters">
-    <div class="box">
+
+    <!-- Terminal -->
+    <div class="box terminal-wrapper" style="display: none">
       <details open="true">
         <summary>Build Process</summary>
         <pre class="terminal"></pre>
       </details>
     </div>
-  </div>
-</div>
 
-<div class="columns is-centered">
-  <div class="column is-three-quarters">
-
+    <!-- App Info -->
     <div class="box">
       <div class="content">
-        <p>
-          <strong>Title:</strong>
-          {{ app.title }}
-        </p>
+        <details open="true">
+          <summary>Info</summary>
+          <div class="content">
+            <p>
+              <strong>Title:</strong>
+              {{ app.title }}
+            </p>
 
-        <p>
-          <strong>IP Address:</strong>
-          <a href="http://{{ app.ipAddress }}" target="_blank">
-            {{ app.ipAddress }}
-          </a>
+            <p>
+              <strong>IP Address:</strong>
+              <a href="http://{{ app.ipAddress }}" target="_blank">
+                {{ app.ipAddress }}
+              </a>
 
-        </p>
-
-        <p>
-          Add a database:
-          <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
+            </p>
             
-            <label>
-              Schema: <input type="file" name="file" />
-            </label>
-
-            <input class="button is-link" type="submit" value="Add Database" />
-          </form>
-        </p>
+            <a href='' class='button is-link'>Edit</a>
+            <a href='/apps' class='button'>Back</a>
+          </div>
+        </details>
       </div>
-
-      <a href='' class='button is-link'>Edit</a>
-      <a href='/apps' class='button'>Back</a>
     </div>
+
+    <!-- App Database -->
+    <div class="box">
+      <details open>
+        <summary>Database</summary>
+
+        <div class="content">
+          <p>
+            Add a database:
+            <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
+              <label>
+                Schema: <input type="file" name="file" />
+              </label>
+
+              <input class="button is-link" type="submit" value="Add Database" />
+            </form>
+          </p>
+        </div>
+      </details>
+    </div>
+
+
   </div>
 </div>
 
@@ -70,7 +83,7 @@
       }
 
       // This only unhides the terminal _if_ we get a message from the server.
-      if (terminalWrapper.style.display !== 'flex') { terminalWrapper.style.display = 'flex'; }
+      if (terminalWrapper.style.display !== 'block') { terminalWrapper.style.display = 'block'; }
 
       const message = JSON.parse(event.data);
 
