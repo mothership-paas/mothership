@@ -4,6 +4,7 @@ const App = require('../server/models').App;
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
+const eventLogger = require('../lib/EventLogger');
 
 module.exports = {
   create(req, res) {
@@ -25,16 +26,17 @@ module.exports = {
       };
 
       App.create(app)
+        .then((app) => {
+          res.redirect(`apps/${app.id}?events`);
+          eventLogger.emit(`message-${app.id}`, `Creating application '${app.title}'`);
+          return app;
+        })
         .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
         .then(DockerWrapper.buildImage)
         .then(DockerWrapper.createNetwork)
         .then(DockerWrapper.createService)
-        .catch(error => {
-          console.log(error);
-          res.status(400).send(error)
-        });      
-
-      return res.redirect(`/apps`)
+        .then((app) => eventLogger.emit(`message-${app.id}`, '===END==='))
+        .catch(error => { throw error; });
     });
   },
 

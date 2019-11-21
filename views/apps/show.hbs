@@ -1,5 +1,5 @@
 <div class="columns is-centered">
-  <div class="column is-half">
+  <div class="column is-three-quarters">
 
     <div class="box">
       <div class="content">
@@ -34,3 +34,36 @@
     </div>
   </div>
 </div>
+
+<div class="columns is-centered terminal-wrapper" style="display: none">
+  <div class="column is-three-quarters">
+    <details open="true">
+      <summary>Build Process</summary>
+      <pre class="terminal"></pre>
+    </details>
+  </div>
+</div>
+
+<script>
+(() => {
+  const terminal = document.querySelector('.terminal');
+  const terminalWrapper = document.querySelector('.terminal-wrapper');
+  const url = new URL(document.location.href);
+  const urlParams = new URLSearchParams(url.search);
+  const showTerminal = urlParams.has('events');
+
+  if (showTerminal) {
+    const eventSource = new EventSource('/events/{{ app.id }}');
+
+    eventSource.addEventListener('message', (event) => {
+      if (terminalWrapper.style.display !== 'flex') { terminalWrapper.style.display = 'flex'; }
+
+      terminal.innerHTML += `<p>${event.data}</p>`;
+      terminal.scrollTop = terminal.scrollHeight;
+      if (event.data === '===END===') {
+        eventSource.close();
+      }
+    });
+  }
+})();
+</script>

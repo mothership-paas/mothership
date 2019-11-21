@@ -4,6 +4,7 @@ const appsController = require('../controllers/apps');
 const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
+const eventLogger = require('../lib/EventLogger');
 
 const storage = multer.diskStorage({
   // TODO: validate that the file is a zip
@@ -21,6 +22,30 @@ const upload = multer({storage});
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
+});
+
+router.get('/events/:appId', (req, res) => {
+  const appId = req.params.appId;
+
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  });
+
+  const messageWriter = data => {
+    res.write(`event: message\n`);
+    res.write(`data: ${data}\n\n`);
+
+    if (data === '===END===') {
+      console.log('Deregistering listener...');
+      eventLogger.off(`message-${appId}`, messageWriter);
+      return res.status(200).end();
+    }
+  };
+
+  console.log(`Creating listener for 'message`);
+  eventLogger.on(`message-${appId}`, messageWriter);
 });
 
 // App
