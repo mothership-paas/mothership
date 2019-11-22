@@ -4,7 +4,13 @@ const appsController = require('../controllers/apps');
 const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
+const stream = require('stream');
+
 const eventLogger = require('../lib/EventLogger');
+const spawn = require('child_process').spawn;
+
+const DockerWrapper = require('../lib/DockerWrapper');
+const App = require('../server/models').App;
 
 const storage = multer.diskStorage({
   // TODO: validate that the file is a zip
@@ -26,6 +32,7 @@ router.get('/', function(req, res, next) {
 
 // Event Streaming
 router.get('/events/:appId', eventLogger.appEvents);
+router.get('/events/:appId/exec', eventLogger.appExecEvents);
 
 // App
 router.get('/apps', appsController.list);
@@ -39,5 +46,44 @@ router.post('/apps/:appId/database', upload.single('file'), appsController.creat
 
 // Scale/Replicas
 router.post('/apps/:appId/scale', appsController.updateReplicas);
+
+router.post('/apps/:appId/exec', (req, res) => {
+  App.findByPk(req.params.appId)
+    .then(async(app) => {
+      const docker = await DockerWrapper.getManagerNodeInstance();
+      const command = req.body.command.split(' ');
+      const image = `${app.title}:latest`; // TODO: Don't hard-code this
+
+      // Create a place to stream command output to, and emit events from
+      // You might think we could just subscribe to the data event on the
+      // stream from Docker run, but the chunks we get from that are weird.
+      // Writing to a file first and tailing the file normalizes the chunks
+      // for some reason.
+      const fileName = app.title + uuid();
+      const outputStream = fs.createWriteStream(fileName);
+      const tail = spawn("tail", ["-f", fileName]);
+      tail.stdout.on('data', data => {
+        const fileContents = fs.readFileSync(fileName);
+        console.log('read from file');
+        app.emitEvent(fileContents.toString('utf8'), 'exec')
+      });
+
+      docker.run(image, command, outputStream, (err, data, container) => {
+        // Remove one-off container once command terminates
+        container.remove();
+      }).on('stream', stream => {
+        // Clean up after there's no more output coming into our stream
+        stream.on('end', () => {
+          outputStream.write('===END===');
+          tail.kill();
+          outputStream.end();
+          fs.unlink(fileName, err => { if (err) { throw err } })
+        })
+      });
+
+      res.send(200, 'OK');
+    })
+    .catch(error => res.status(404).send(error));
+});
 
 module.exports = router;
