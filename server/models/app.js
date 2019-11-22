@@ -14,9 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
   };
 
-  App.prototype.emitEvent = function(message) {
-    console.log(message);
-    eventLogger.emit(`message-${this.id}`, message + '\n');
+  App.prototype.emitEvent = function(message, type) {
+    if (type === 'exec') {
+      eventLogger.emit(`exec-message-${this.id}`, message);
+    } else {
+      eventLogger.emit(`message-${this.id}`, message + '\n');
+    }
   };
 
   App.prototype.emitStdout = function(data) {
