@@ -27,12 +27,15 @@ module.exports = {
 
       App.create(app)
         .then((app) => {
+          
           // Set app subdomain now that we have id
           return new Promise(async(resolve, reject) => {
             const domain = await Config.findOne({
               where: { key: 'domain' },
             })
             await app.update({ url: `${app.title}${app.id}.${domain.value}` });
+            app.emitEvent(`Creating application '${app.title}'`)
+            res.redirect(`apps/${app.id}?events`);
             resolve(app);
           });
         })
@@ -40,12 +43,10 @@ module.exports = {
         .then(DockerWrapper.buildImage)
         .then(DockerWrapper.createNetwork)
         .then(DockerWrapper.createService)
-        .catch(error => {
-          console.log(error);
-          res.status(400).send(error)
-        });      
-
-      return res.redirect(`/apps`)
+        .then((app) => {
+          app.emitEvent('===END===');
+        })
+        .catch(error => { throw error; });
     });
   },
 
@@ -115,5 +116,24 @@ module.exports = {
       });
 
     res.redirect('/apps');
+  },
+
+  updateReplicas(req, res) {
+    const scale = parseInt(req.body.scale);
+
+    if (scale < 1 || scale > 10) {
+      return res.status(400).send('Value must be between 1 and 10!');
+    }
+
+    const serviceConfig = { "Mode": { "Replicated": { "Replicas": scale }}};
+
+    App.findByPk(req.params.appId)
+      .then((app) => app.update({ replicas: scale }))
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`)
+        return app;
+      })
+      .then(DockerWrapper.updateService(serviceConfig))
+      .catch(error => console.log(error));
   },
 };
