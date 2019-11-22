@@ -37,4 +37,7 @@ router.delete('/apps/:appId', appsController.destroy);
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
 
+// Scale/Replicas
+router.post('/apps/:appId/scale', appsController.updateReplicas);
+
 module.exports = router;
