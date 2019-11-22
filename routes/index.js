@@ -7,7 +7,6 @@ const uuid = require('uuid/v1');
 const stream = require('stream');
 
 const eventLogger = require('../lib/EventLogger');
-const Tail = require('nodejs-tail');
 const spawn = require('child_process').spawn;
 
 const DockerWrapper = require('../lib/DockerWrapper');
