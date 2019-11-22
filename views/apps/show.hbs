@@ -75,7 +75,7 @@
                     Run
                   </button>
                 </div>
-              </div>         
+              </div>
             </form>
           </p>
 
@@ -84,6 +84,28 @@
               <pre class="terminal"></pre>
             </details>
           </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Scaling -->
+    <div class="box">
+      <details open>
+        <summary>Scaling</summary>
+
+        <div class="content">
+          <p>There are currently <strong>{{ app.replicas }}</strong> instance(s) of this app. You can scale the number of instances below.</p>
+        </div>
+
+        <div class="content">
+
+          <form method="POST" action="/apps/{{ app.id }}/scale">
+            <label>
+              Instances: <input type="number" name="scale" value="{{ app.replicas }}" />
+            </label>
+
+            <input class="button is-link" type="submit" value="Update" />
+          </form>
         </div>
       </details>
     </div>
@@ -166,7 +188,7 @@
         execTerminal.innerHTML = message;
         execTerminal.scrollTop = execTerminal.scrollHeight;
       });
-      
+
     });
   })();
 </script>

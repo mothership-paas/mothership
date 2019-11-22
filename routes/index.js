@@ -44,8 +44,11 @@ router.delete('/apps/:appId', appsController.destroy);
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
 
+// Scale/Replicas
+router.post('/apps/:appId/scale', appsController.updateReplicas);
+
 router.post('/apps/:appId/exec', (req, res) => {
-  App.findByPk(req.params.appId) 
+  App.findByPk(req.params.appId)
     .then(async(app) => {
       const docker = await DockerWrapper.getManagerNodeInstance();
       const command = req.body.command.split(' ');
@@ -77,7 +80,7 @@ router.post('/apps/:appId/exec', (req, res) => {
           fs.unlink(fileName, err => { if (err) { throw err } })
         })
       });
-      
+
       res.send(200, 'OK');
     })
     .catch(error => res.status(404).send(error));

@@ -108,4 +108,23 @@ module.exports = {
 
     res.redirect('/apps');
   },
+
+  updateReplicas(req, res) {
+    const scale = parseInt(req.body.scale);
+
+    if (scale < 1 || scale > 10) {
+      return res.status(400).send('Value must be between 1 and 10!');
+    }
+
+    const serviceConfig = { "Mode": { "Replicated": { "Replicas": scale }}};
+
+    App.findByPk(req.params.appId)
+      .then((app) => app.update({ replicas: scale }))
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`)
+        return app;
+      })
+      .then(DockerWrapper.updateService(serviceConfig))
+      .catch(error => console.log(error));
+  },
 };
