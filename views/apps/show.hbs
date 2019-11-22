@@ -2,7 +2,7 @@
   <div class="column is-three-quarters">
 
     <!-- Terminal -->
-    <div class="box terminal-wrapper" style="display: none">
+    <div id="build-terminal" class="box terminal-wrapper" style="display: none">
       <details open="true">
         <summary>Build Process</summary>
         <pre class="terminal"></pre>
@@ -27,7 +27,7 @@
               </a>
 
             </p>
-            
+
             <a href='' class='button is-link'>Edit</a>
             <a href='/apps' class='button'>Back</a>
           </div>
@@ -55,48 +55,118 @@
       </details>
     </div>
 
+    <!-- Command Runner -->
+    <div class="box">
+      <details open>
+        <summary>Run Commands</summary>
+
+        <div class="content">
+          <p>
+            Run command in {{app.title}} app:
+            <form id="exec-form">
+
+              <div class="field has-addons">
+                <div class="control">
+                  <input id="command" class="input" type="text" name="command" placeholder="bundle install">
+                </div>
+
+                <div class="control">
+                  <button type="submit" class="button is-info">
+                    Run
+                  </button>
+                </div>
+              </div>         
+            </form>
+          </p>
+
+          <div id="exec-terminal" class="terminal-wrapper" style="display: none">
+            <details open="true">
+              <pre class="terminal"></pre>
+            </details>
+          </div>
+        </div>
+      </details>
+    </div>
 
   </div>
 </div>
 
 <script>
-(() => {
-  const terminalWrapper = document.querySelector('.terminal-wrapper');
-  const terminal = document.querySelector('.terminal');
-  const url = new URL(document.location.href);
-  const urlParams = new URLSearchParams(url.search);
-  const showTerminal = urlParams.has('events');
+  (() => {
+    const terminalWrapper = document.getElementById('build-terminal');
+    const terminal = document.querySelector('#build-terminal .terminal');
+    const url = new URL(document.location.href);
+    const urlParams = new URLSearchParams(url.search);
+    const showTerminal = urlParams.has('events');
 
-  if (showTerminal) {
-    const appEventEndpoint = new EventSource('/events/{{ app.id }}');
+    if (showTerminal) {
+      const appEventEndpoint = new EventSource('/events/{{ app.id }}');
 
-    const minimizeTerminal = () => {
-      terminalWrapper.querySelector('details').removeAttribute('open');
-      terminalWrapper.querySelector('summary').innerHTML = 'Build Complete';
-    };
+      const minimizeTerminal = () => {
+        terminalWrapper.querySelector('details').removeAttribute('open');
+        terminalWrapper.querySelector('summary').innerHTML = 'Build Complete';
+      };
 
-    const messageHandler = (event) => {
-      if (event.lastEventId === '-1') {
+      const messageHandler = (event) => {
+        if (event.lastEventId === '-1') {
+          appEventEndpoint.close();
+          minimizeTerminal();
+          return;
+        }
+
+        // This only unhides the terminal _if_ we get a message from the server.
+        if (terminalWrapper.style.display !== 'block') { terminalWrapper.style.display = 'block'; }
+
+        const message = JSON.parse(event.data);
+
+        terminal.innerHTML += message;
+        terminal.scrollTop = terminal.scrollHeight;
+      };
+
+      const errorHandler = (error) => {
         appEventEndpoint.close();
-        minimizeTerminal();
-        return;
-      }
+      };
 
-      // This only unhides the terminal _if_ we get a message from the server.
-      if (terminalWrapper.style.display !== 'block') { terminalWrapper.style.display = 'block'; }
+      appEventEndpoint.addEventListener('message', messageHandler);
+      appEventEndpoint.addEventListener('error', errorHandler);
+    }
 
-      const message = JSON.parse(event.data);
+    // Exec Terminal
+    const execForm = document.getElementById('exec-form');
+    const submitButton = document.querySelector('#exec-form .button');
 
-      terminal.innerHTML += message;
-      terminal.scrollTop = terminal.scrollHeight;
-    };
+    submitButton.addEventListener('click', function (event) {
+      event.preventDefault();
 
-    const errorHandler = (error) => {
-      appEventEndpoint.close();
-    };
+      const command = document.querySelector('#exec-form .input').value;
+      const execTerminalWrapper = document.getElementById('exec-terminal');
+      const appEventEndpoint = new EventSource('/events/{{ app.id }}/exec');
 
-    appEventEndpoint.addEventListener('message', messageHandler);
-    appEventEndpoint.addEventListener('error', errorHandler);
-  }
-})();
+      fetch('/apps/{{ app.id }}/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'command=' + encodeURIComponent(command),
+      })
+
+      execTerminalWrapper.style.display = 'block';
+      const execTerminal = document.querySelector('#exec-terminal .terminal');
+
+      appEventEndpoint.addEventListener('message', function (message) {
+        if (event.lastEventId === '-1') {
+          appEventEndpoint.close();
+          execTerminal.style.display = 'none';
+          console.log('stopped listening');
+          return;
+        }
+        message = JSON.parse(message.data);
+        message = message.join('\n');
+        console.log(message);
+        execTerminal.innerHTML = message;
+        execTerminal.scrollTop = execTerminal.scrollHeight;
+      });
+      
+    });
+  })();
 </script>
