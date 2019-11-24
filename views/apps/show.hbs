@@ -59,12 +59,34 @@
           </div>
         </article>
 
-        <form method="POST" action="/apps/181/database" enctype="multipart/form-data">
-          <label>
-            Schema: <input type="file" name="file">
-          </label>
+        <form method="POST" action="/apps/{{app.id}}/database" enctype="multipart/form-data">
+          <div class="field">
+            <div id="file-js-example" class="file is-small has-name">
+              <label class="file-label">
+                <input class="file-input" type="file" name="file">
 
-          <input class="button is-link" type="submit" value="Add Database">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+
+                  <span class="file-label">
+                    Add schema.sql file (optional)...
+                  </span>
+                </span>
+
+                <span class="file-name">
+                  No file uploaded
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <button class="button is-link" type="submit">
+             Add Database
+            </button>
+          </div>
       </form>
     </div>
   </details>
@@ -127,6 +149,16 @@
 
 <script>
   (() => {
+    // Update schema file upload field to reflect name of uploaded file
+    const fileInput = document.querySelector('#file-js-example input[type=file]');
+    fileInput.onchange = () => {
+      if (fileInput.files.length > 0) {
+        const fileName = document.querySelector('#file-js-example .file-name');
+        fileName.textContent = fileInput.files[0].name;
+      }
+    }
+
+    // Build terminal
     const terminalWrapper = document.getElementById('build-terminal');
     const terminal = document.querySelector('#build-terminal .terminal');
     const url = new URL(document.location.href);
