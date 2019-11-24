@@ -1,116 +1,117 @@
-<div class="columns is-centered">
-  <div class="column is-three-quarters">
+<!-- Terminal -->
+<div id="build-terminal" class="box terminal-wrapper" style="display: none">
+  <details open="true">
+    <summary>
+      Build Process
+      <progress
+        class="progress is-small is-info"
+        max="100"
+        style="max-width: 300px;margin-left: auto;max-width: 150px;"
+      ></progress>
+    </summary>
+    <pre class="terminal"></pre>
+  </details>
+</div>
 
-    <!-- Terminal -->
-    <div id="build-terminal" class="box terminal-wrapper" style="display: none">
-      <details open="true">
-        <summary>Build Process</summary>
-        <pre class="terminal"></pre>
-      </details>
-    </div>
-
-    <!-- App Info -->
-    <div class="box">
+<!-- App Info -->
+<div class="box">
+  <div class="content">
+    <details open="true">
+      <summary>Info</summary>
       <div class="content">
-        <details open="true">
-          <summary>Info</summary>
-          <div class="content">
-            <p>
-              <strong>Title:</strong>
-              {{ app.title }}
-            </p>
+        <p>
+          <strong>Title:</strong>
+          {{ app.title }}
+        </p>
 
-            <p>
-              <strong>IP Address:</strong>
-              <a href="http://{{ app.ipAddress }}" target="_blank">
-                {{ app.ipAddress }}
-              </a>
+        <p>
+          <strong>IP Address:</strong>
+          <a href="http://{{ app.ipAddress }}" target="_blank">
+            {{ app.ipAddress }}
+          </a>
 
-            </p>
+        </p>
 
-            <a href='' class='button is-link'>Edit</a>
-            <a href='/apps' class='button'>Back</a>
+        <a href='' class='button is-link'>Edit</a>
+        <a href='/apps' class='button'>Back</a>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- App Database -->
+<div class="box">
+  <details open>
+    <summary>Database</summary>
+
+    <div class="content">
+      <p>
+        Add a database:
+        <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
+          <label>
+            Schema: <input type="file" name="file" />
+          </label>
+
+          <input class="button is-link" type="submit" value="Add Database" />
+        </form>
+      </p>
+    </div>
+  </details>
+</div>
+
+<!-- Command Runner -->
+<div class="box">
+  <details open>
+    <summary>Run Commands</summary>
+
+    <div class="content">
+      <p>
+        Run command in {{app.title}} app:
+        <form id="exec-form">
+
+          <div class="field has-addons">
+            <div class="control">
+              <input id="command" class="input" type="text" name="command" placeholder="bundle install">
+            </div>
+
+            <div class="control">
+              <button type="submit" class="button is-info">
+                Run
+              </button>
+            </div>
           </div>
+        </form>
+      </p>
+
+      <div id="exec-terminal" class="terminal-wrapper" style="display: none">
+        <details open="true">
+          <pre class="terminal"></pre>
         </details>
       </div>
     </div>
+  </details>
+</div>
 
-    <!-- App Database -->
-    <div class="box">
-      <details open>
-        <summary>Database</summary>
+<!-- Scaling -->
+<div class="box">
+  <details open>
+    <summary>Scaling</summary>
 
-        <div class="content">
-          <p>
-            Add a database:
-            <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
-              <label>
-                Schema: <input type="file" name="file" />
-              </label>
-
-              <input class="button is-link" type="submit" value="Add Database" />
-            </form>
-          </p>
-        </div>
-      </details>
+    <div class="content">
+      <p>There are currently <strong>{{ app.replicas }}</strong> instance(s) of this app. You can scale the number of instances below.</p>
     </div>
 
-    <!-- Command Runner -->
-    <div class="box">
-      <details open>
-        <summary>Run Commands</summary>
+    <div class="content">
 
-        <div class="content">
-          <p>
-            Run command in {{app.title}} app:
-            <form id="exec-form">
+      <form method="POST" action="/apps/{{ app.id }}/scale">
+        <label>
+          Instances: <input type="number" name="scale" value="{{ app.replicas }}" />
+        </label>
 
-              <div class="field has-addons">
-                <div class="control">
-                  <input id="command" class="input" type="text" name="command" placeholder="bundle install">
-                </div>
-
-                <div class="control">
-                  <button type="submit" class="button is-info">
-                    Run
-                  </button>
-                </div>
-              </div>
-            </form>
-          </p>
-
-          <div id="exec-terminal" class="terminal-wrapper" style="display: none">
-            <details open="true">
-              <pre class="terminal"></pre>
-            </details>
-          </div>
-        </div>
-      </details>
+        <input class="button is-link" type="submit" value="Update" />
+      </form>
     </div>
-
-    <!-- Scaling -->
-    <div class="box">
-      <details open>
-        <summary>Scaling</summary>
-
-        <div class="content">
-          <p>There are currently <strong>{{ app.replicas }}</strong> instance(s) of this app. You can scale the number of instances below.</p>
-        </div>
-
-        <div class="content">
-
-          <form method="POST" action="/apps/{{ app.id }}/scale">
-            <label>
-              Instances: <input type="number" name="scale" value="{{ app.replicas }}" />
-            </label>
-
-            <input class="button is-link" type="submit" value="Update" />
-          </form>
-        </div>
-      </details>
-    </div>
-
-  </div>
+  </details>
 </div>
 
 <script>
