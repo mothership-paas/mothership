@@ -45,16 +45,27 @@
     <summary>Database</summary>
 
     <div class="content">
-      <p>
-        Add a database:
-        <form method="POST" action="/apps/{{ app.id }}/database" enctype="multipart/form-data">
+        <article class="message is-link">
+          <div class="message-body">
+            <p>This application doesn't have a database. You can add a database below.</p>
+            <p>
+              Once a database has been added, environment variables are available in
+              your application for <code>DB_NAME</code>, <code>DB_NAME</code>,
+              <code>DB_NAME</code>, and <code>DB_NAME</code>. If you'd like, you can
+              initialize your database by uploading a <code>schema.sql</code> file. Or,
+              if you commands for setting up your database and running migrations, you
+              can run them in the commands section below after adding a database.
+            </p>
+          </div>
+        </article>
+
+        <form method="POST" action="/apps/181/database" enctype="multipart/form-data">
           <label>
-            Schema: <input type="file" name="file" />
+            Schema: <input type="file" name="file">
           </label>
 
-          <input class="button is-link" type="submit" value="Add Database" />
-        </form>
-      </p>
+          <input class="button is-link" type="submit" value="Add Database">
+      </form>
     </div>
   </details>
 </div>
