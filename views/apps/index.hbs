@@ -8,6 +8,13 @@
       {{#if apps.length}}
         <div class="box">
           <table class="table is-hoverable is-fullwidth">
+            <thead>
+            <tr>
+              <td>Name</td>
+              <td>URL</td>
+              <td><span class="is-pulled-right">Actions</span></td>
+            </tr>
+            </thead>
             {{#each apps}}
               <tr>
                 <td>
@@ -15,7 +22,7 @@
                 </td>
                 <td>
                   <a href="http://{{url}}" target="_blank">
-                    {{url}}
+                    http://{{url}}
                   </a>
                 </td>
                 <td>
