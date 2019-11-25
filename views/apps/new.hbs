@@ -4,14 +4,22 @@
     <div class="box">
       <h1 class="subtitle">Create App</h1>
 
-      <article class="message is-info">
-        <div class="message-body">
-          To create and deploy new app, attach a .zip file containing your app&rsquo;s
-          source code and click create &ndash; we&rsquo;ll take care of the
-          rest. Be sure that your zip file does not nest your app files 
-          in an extra directory.
-        </div>
-      </article>
+      {{#if error}}
+        <article class="message is-danger">
+          <div class="message-body">
+            {{ error }}
+          </div>
+        </article>
+      {{else}}
+        <article class="message is-info">
+          <div class="message-body">
+            To create and deploy new app, attach a .zip file containing your app&rsquo;s
+            source code and click create &ndash; we&rsquo;ll take care of the
+            rest. Be sure that your zip file does not nest your app files
+            in an extra directory.
+          </div>
+        </article>
+      {{/if}}
 
       <form method="POST" action="/apps" enctype="multipart/form-data">
         <div class="field">
