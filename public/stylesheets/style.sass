@@ -1,30 +1,66 @@
-html,
 body
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  font-size: 16px;
+  display: flex
+  height: 100vh
+  background: #f1f2f6
+
+nav
+  margin-top: 16px
+
+nav ul li
+  margin-left: 8px
+
+nav.main-nav
+  margin: 0
+  min-width: 225px
+  border-right: 1px solid #e9eaeb
+  background: #fff
+
+
+nav.main-nav .logo
+  text-align: center
+  padding: 12px 0
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 20px 0
+
+nav.main-nav li
+  margin: 8px
+
+nav.main-nav li a
+  padding: 8px
+  border-radius: 4px
+  width: 100%
+  display: flex
+  align-items: center
+  color: #777
+
+nav.main-nav li.is-active a
+  background: #e0ecfe
+  color: #3273dc
+
+nav.main-nav li svg
+  margin-right: 8px
+  color: currentColor
+  width: 18px
 
 table.table td,
 table.table th
-  vertical-align: middle;
+  vertical-align: middle
 
 table.table td
-  border-color: #e9eaeb;
+  border-color: #e9eaeb
 
 .box
-  box-shadow: none;
-  border: 1px solid #e9eaeb;
+  box-shadow: none
+  border: 1px solid #e9eaeb
 
-nav
-  margin-top: 16px;
-
-nav ul li
-  margin-left: 8px;
+.main-section
+  flex: 1
+  padding-top: 2rem
 
 .message
-  margin: 16px 0;
+  margin: 16px 0
 
 .terminal
   background: #222
@@ -36,6 +72,8 @@ nav ul li
 
 details summary
   font-weight: bold
+  display: flex
+  align-items: center
 
 details[open] summary
   margin-bottom: 1rem
