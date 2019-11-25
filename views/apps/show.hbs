@@ -170,7 +170,10 @@
 
       const minimizeTerminal = () => {
         terminalWrapper.querySelector('details').removeAttribute('open');
-        terminalWrapper.querySelector('summary').innerHTML = 'Build Complete';
+        terminalWrapper
+          .querySelector('summary')
+          .innerHTML = '<span class="icon has-text-success"><i class="fas fa-check-circle"></i></span> Build Complete';
+        terminalWrapper.classList.add('build-terminal-complete');
       };
 
       const messageHandler = (event) => {
