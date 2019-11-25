@@ -44,6 +44,7 @@ module.exports = {
           resolve(app);
         });
       })
+      .catch(error => res.render('apps/new', { errors: error.errors }))
       .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.createNetwork)
