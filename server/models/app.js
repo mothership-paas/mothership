@@ -10,6 +10,12 @@ module.exports = (sequelize, DataTypes) => {
         args: true,
         msg: 'App title is already in use!'
       },
+      validate: {
+        is: {
+          args: /^[a-z0-9-]+$/,
+          msg: 'Title must only contain lowercase letters, numbers, or dashes.'
+        },
+      },
     },
     path: DataTypes.STRING,
     filename: DataTypes.STRING,
