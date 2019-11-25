@@ -4,7 +4,13 @@ const eventLogger = require('../../lib/EventLogger').eventLogger;
 module.exports = (sequelize, DataTypes) => {
 
   const App = sequelize.define('App', {
-    title: DataTypes.STRING,
+    title: {
+      type: DataTypes.STRING,
+      unique: {
+        args: true,
+        msg: 'App title is already in use!'
+      },
+    },
     path: DataTypes.STRING,
     filename: DataTypes.STRING,
     network: DataTypes.STRING,
