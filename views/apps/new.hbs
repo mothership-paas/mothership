@@ -4,10 +4,14 @@
     <div class="box">
       <h1 class="subtitle">Create App</h1>
 
-      {{#if error}}
+      {{#if errors}}
         <article class="message is-danger">
           <div class="message-body">
-            {{ error }}
+            <ul>
+              {{#each errors}}
+                <li>{{this.message}}</li>
+              {{/each}}
+            </ul>
           </div>
         </article>
       {{else}}
