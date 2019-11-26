@@ -76,11 +76,12 @@ router.post('/apps/:appId/exec', (req, res) => {
       }).on('stream', stream => {
         // Clean up after there's no more output coming into our stream
         stream.on('end', () => {
-          outputStream.write('===END===');
           tail.kill();
-          outputStream.end();
-          fs.unlink(fileName, err => { if (err) { throw err } })
-        })
+          app.emitEvent('===END===');
+          outputStream.end(() => {
+            fs.unlink(fileName, err => { if (err) { throw err } })
+          });
+        });
       });
 
       res.send(200, 'OK');
