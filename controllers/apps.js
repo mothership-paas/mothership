@@ -1,5 +1,6 @@
 const DockerWrapper = require('../lib/DockerWrapper');
 const App = require('../server/models').App;
+const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
 
 const slugify = require('slugify');
@@ -106,6 +107,15 @@ module.exports = {
               resolve(app);
             });
           });
+        });
+      })
+      .then((app) => {
+        return new Promise((resolve, reject) => {
+          Database.create({
+            service_name: `${app.title}_database`,
+            app_id: app.id,
+            network: app.network
+          }).then(() => resolve(app));
         });
       })
       .then(DockerWrapper.createDatabase)
