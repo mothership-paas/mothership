@@ -7,48 +7,56 @@ const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
 
-module.exports = {
-  create(req, res) {
-    // TODO: Make path relative to app root directory
-    fs.mkdir(`uploads/${req.body.title}`, err => {
-      fs.rename(
-        req.file.path,
-        `uploads/${req.body.title}/${req.file.filename}.zip`,
-        (err) => {
-          if (err) { console.log(err) }
-        }
-      )
+const moveApplicationFile = (req) => {
+  return new Promise((resolve, reject) => {
+    const destination = `uploads/${req.body.title}/${req.file.filename}.zip`;
 
-      const app = {
-        title: req.body.title,
-        path: `uploads/${req.body.title}`,
-        filename: req.file.filename + '.zip',
-        network: `${req.body.title}_default`
-      };
-
-      App.create(app)
-        .then((app) => {
-
-          // Set app subdomain now that we have id
-          return new Promise(async(resolve, reject) => {
-            const domain = await Config.findOne({
-              where: { key: 'domain' },
-            })
-            await app.update({ url: `${app.title}${app.id}.${domain.value}` });
-            app.emitEvent(`Creating application '${app.title}'`)
-            res.redirect(`apps/${app.id}?events`);
-            resolve(app);
-          });
-        })
-        .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
-        .then(DockerWrapper.buildImage)
-        .then(DockerWrapper.createNetwork)
-        .then(DockerWrapper.createService)
-        .then((app) => {
-          app.emitEvent('===END===');
-        })
-        .catch(error => { throw error; });
+    fs.mkdir(`uploads/${req.body.title}`, (err) => {
+      fs.rename(req.file.path, destination, (err) => {
+        if (err) { reject(err) }
+        resolve(req);
+      });
     });
+  });
+};
+
+module.exports = {
+  async create(req, res) {
+    // TODO: Make path relative to app root directory
+    const app = {
+      title: req.body.title,
+      path: `uploads/${req.body.title}`,
+      filename: req.file.filename + '.zip',
+      network: `${req.body.title}_default`
+    };
+
+    await moveApplicationFile(req);
+
+    App.create(app)
+      .then((app) => {
+        // Set app subdomain now that we have id
+        return new Promise(async(resolve, reject) => {
+          const domain = await Config.findOne({
+            where: { key: 'domain' },
+          })
+          await app.update({ url: `${app.title}.${domain.value}` });
+          app.emitEvent(`Creating application '${app.title}'`)
+          res.redirect(`apps/${app.id}?events`);
+          resolve(app);
+        });
+      })
+      .catch(error => {
+        res.render('apps/new', { errors: error.errors });
+        throw error;
+      })
+      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildImage)
+      .then(DockerWrapper.createNetwork)
+      .then(DockerWrapper.createService)
+      .then((app) => {
+        app.emitEvent('===END===');
+      })
+      .catch(error => { console.log(error); });
   },
 
   list(req, res) {
