@@ -22,6 +22,10 @@ const moveApplicationFile = (req) => {
 
 module.exports = {
   async create(req, res) {
+    if (!req.file || req.file.mimetype !== 'application/zip') {
+      return res.render('apps/new', { errors: [{ message: 'Please attach a .zip file of your application.' }] })
+    }
+
     // TODO: Make path relative to app root directory
     const app = {
       title: req.body.title,
