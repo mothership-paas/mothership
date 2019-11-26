@@ -28,7 +28,7 @@ module.exports = {
 
       App.create(app)
         .then((app) => {
-          
+
           // Set app subdomain now that we have id
           return new Promise(async(resolve, reject) => {
             const domain = await Config.findOne({
@@ -95,17 +95,20 @@ module.exports = {
   },
 
   createDatabase(req, res) {
-    console.log(req.file);
     App.findByPk(req.params.appId)
       .then((app) => {
         return new Promise((resolve, reject) => {
           fs.mkdir(`uploads/${app.title}/db`, err => {
             if (err) { reject(err); }
 
-            fs.rename(req.file.path, `uploads/${app.title}/db/schema.sql`, (err) => {
-              if (err) { reject(err); }
+            if (!req.file) {
               resolve(app);
-            });
+            } else {
+              fs.rename(req.file.path, `uploads/${app.title}/db/schema.sql`, (err) => {
+                if (err) { reject(err); }
+                resolve(app);
+              });
+            }
           });
         });
       })
