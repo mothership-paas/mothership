@@ -1,5 +1,6 @@
 const DockerWrapper = require('../lib/DockerWrapper');
 const App = require('../server/models').App;
+const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
 
 const slugify = require('slugify');
@@ -72,13 +73,16 @@ module.exports = {
 
   show(req, res) {
     return App
-      .findByPk(req.params.appId)
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
       .then(app => {
         if (!app) {
           return res.status(404).send({
             message: 'App Not Found'
           });
         }
+
         res.render('apps/show', { app });
       })
       .catch(error => res.status(400).send(error));
