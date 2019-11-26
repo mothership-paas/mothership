@@ -22,6 +22,10 @@ const moveApplicationFile = (req) => {
 
 module.exports = {
   async create(req, res) {
+    if (!req.file || req.file.mimetype !== 'application/zip') {
+      return res.render('apps/new', { errors: [{ message: 'Please attach a .zip file of your application.' }] })
+    }
+
     // TODO: Make path relative to app root directory
     const app = {
       title: req.body.title,
@@ -73,13 +77,16 @@ module.exports = {
 
   show(req, res) {
     return App
-      .findByPk(req.params.appId)
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
       .then(app => {
         if (!app) {
           return res.status(404).send({
             message: 'App Not Found'
           });
         }
+
         res.render('apps/show', { app });
       })
       .catch(error => res.status(400).send(error));

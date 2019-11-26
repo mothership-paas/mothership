@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
 
   App.associate = function(models) {
-    // associations can be defined here
+    App.belongsTo(models.Database, {foreignKey: 'databaseId', as: 'database'});
   };
 
   App.prototype.emitEvent = function(message, type) {

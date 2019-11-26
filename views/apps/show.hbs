@@ -32,8 +32,8 @@
 
         </p>
 
-        <a href='' class='button is-link'>Edit</a>
-        <a href='/apps' class='button'>Back</a>
+        <a href="" class="button is-link">Edit</a>
+        <a href="/apps" class="button">Back</a>
       </div>
     </details>
   </div>
@@ -45,6 +45,14 @@
     <summary>Database</summary>
 
     <div class="content">
+      {{#if app.database}}
+        <p>Your app is using the database <code>{{app.database.service_name}}</code>.</p>
+        <p>
+          Connection details have been set in your application in the environment
+          variables <code>DATABASE_HOST</code>, <code>POSTGRES_DB</code>,
+          <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>. Be sure to
+          configure your application to use these environmeent variables to connect.
+      {{else}}
         <article class="message is-link">
           <div class="message-body">
             <p>This application doesn't have a database. You can add a database below.</p>
@@ -88,6 +96,7 @@
             </button>
           </div>
       </form>
+      {{/if}}
     </div>
   </details>
 </div>
