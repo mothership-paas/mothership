@@ -7,22 +7,20 @@ const uuidv1 = require('uuid/v1');
 const fs = require('fs');
 
 const moveApplicationFile = (req) => {
-  return () => {
-    return new Promise((resolve, reject) => {
-      const destination = `uploads/${req.body.title}/${req.file.filename}.zip`;
+  return new Promise((resolve, reject) => {
+    const destination = `uploads/${req.body.title}/${req.file.filename}.zip`;
 
-      fs.mkdir(`uploads/${req.body.title}`, (err) => {
-        fs.rename(req.file.path, destination, (err) => {
-          if (err) { reject(err) }
-          resolve(req);
-        });
+    fs.mkdir(`uploads/${req.body.title}`, (err) => {
+      fs.rename(req.file.path, destination, (err) => {
+        if (err) { reject(err) }
+        resolve(req);
       });
     });
-  };
+  });
 };
 
 module.exports = {
-  create(req, res) {
+  async create(req, res) {
     // TODO: Make path relative to app root directory
     const app = {
       title: req.body.title,
@@ -31,8 +29,9 @@ module.exports = {
       network: `${req.body.title}_default`
     };
 
+    await moveApplicationFile(req);
+
     App.create(app)
-      .then(moveApplicationFile(req))
       .then((app) => {
         // Set app subdomain now that we have id
         return new Promise(async(resolve, reject) => {
