@@ -133,7 +133,11 @@ module.exports = {
             service_name: `${app.title}_database`,
             app_id: app.id,
             network: app.network
-          }).then(() => resolve(app));
+          }).then((database) => {
+            return app.setDatabase(database)
+          }).then(() => {
+            resolve(app);
+          });
         });
       })
       .then(DockerWrapper.createDatabase)
