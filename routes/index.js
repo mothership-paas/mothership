@@ -70,7 +70,20 @@ router.post('/apps/:appId/exec', (req, res) => {
         });
       });
 
-      docker.run(image, command, outputStream, (err, data, container) => {
+      const runOptions =  { 
+        Env: [
+          // TODO: These shouldn't be hard-coded... store in db?
+          `DATABASE_HOST=${app.title}_database`,
+          `POSTGRES_USER=postgres`,
+          `POSTGRES_PASSWORD=password`,
+          `POSTGRES_DB=${app.title}`
+        ],
+        "HostConfig": {
+          "NetworkMode": `${app.network}`,
+        },
+      };
+
+      docker.run(image, command, outputStream, runOptions, (err, data, container) => {
         // Remove one-off container once command terminates
         container.remove();
       }).on('stream', stream => {
