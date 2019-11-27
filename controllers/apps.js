@@ -54,6 +54,7 @@ module.exports = {
         throw error;
       })
       .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildDockerignoreFile())
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.createNetwork)
       .then(DockerWrapper.createService)
