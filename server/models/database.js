@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
   const Database = sequelize.define('Database', {
     service_name: DataTypes.STRING,
     volume: DataTypes.STRING,
-    network: DataTypes.STRING
+    network: DataTypes.STRING,
+    app_id: DataTypes.INTEGER,
   }, {});
 
   Database.associate = function(models) {
