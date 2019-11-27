@@ -132,7 +132,8 @@ module.exports = {
           Database.create({
             service_name: `${app.title}_database`,
             app_id: app.id,
-            network: app.network
+            network: app.network,
+            volume: `${app.title}_db_data`,
           }).then((database) => {
             return app.setDatabase(database)
           }).then(() => {
