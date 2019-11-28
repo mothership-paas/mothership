@@ -179,16 +179,25 @@
 
       const minimizeTerminal = () => {
         terminalWrapper.querySelector('details').removeAttribute('open');
-        terminalWrapper
-          .querySelector('summary')
-          .innerHTML = '<span class="icon has-text-success"><i class="fas fa-check-circle"></i></span> Build Complete';
-        terminalWrapper.classList.add('build-terminal-complete');
       };
 
       const messageHandler = (event) => {
         if (event.lastEventId === '-1') {
           appEventEndpoint.close();
+          terminalWrapper.classList.add('build-terminal-complete');
           minimizeTerminal();
+          terminalWrapper
+            .querySelector('summary')
+            .innerHTML = '<span class="icon has-text-success"><i class="fas fa-check-circle"></i></span> Build complete!';
+          return;
+        }
+
+        if (event.lastEventId === '-2') {
+          appEventEndpoint.close();
+          terminalWrapper.classList.add('build-terminal-failed');
+          terminalWrapper
+            .querySelector('summary')
+            .innerHTML = '<span class="icon has-text-danger"><i class="fas fa-times-circle"></i></span> Build failed!';
           return;
         }
 
