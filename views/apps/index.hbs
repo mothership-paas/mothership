@@ -7,33 +7,35 @@
 
       {{#if apps.length}}
         <div class="box">
-          <table class="table is-hoverable is-fullwidth">
-            <thead>
-            <tr>
-              <td>Name</td>
-              <td>URL</td>
-              <td><span class="is-pulled-right">Actions</span></td>
-            </tr>
-            </thead>
-            {{#each apps}}
+          <div class="table-container">
+            <table class="table is-hoverable is-fullwidth">
+              <thead>
               <tr>
-                <td>
-                  <a href="/apps/{{ id }}">{{title}}</a>
-                </td>
-                <td>
-                  <a href="http://{{url}}" target="_blank">
-                    http://{{url}}
-                  </a>
-                </td>
-                <td>
-                  <div class="buttons are-small is-pulled-right">
-                    <a href="/apps/edit/{{ id }}" class="button is-light">Edit</a>
-                    <a class="button is-danger is-light">Delete (NYI)</a>
-                  </div>
-                </td>
+                <td>Name</td>
+                <td>URL</td>
+                <td><span class="is-pulled-right">Actions</span></td>
               </tr>
-            {{/each}}
-          </table>
+              </thead>
+              {{#each apps}}
+                <tr>
+                  <td>
+                    <a href="/apps/{{ id }}">{{title}}</a>
+                  </td>
+                  <td>
+                    <a href="http://{{url}}" target="_blank">
+                      http://{{url}}
+                    </a>
+                  </td>
+                  <td>
+                    <div class="buttons are-small is-pulled-right">
+                      <a href="/apps/edit/{{ id }}" class="button is-light">Edit</a>
+                      <a class="button is-danger is-light">Delete (NYI)</a>
+                    </div>
+                  </td>
+                </tr>
+              {{/each}}
+            </table>
+          </div>
         </div>
       {{/if}}
 
