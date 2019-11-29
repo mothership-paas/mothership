@@ -136,17 +136,34 @@ module.exports = {
   },
 
   createDatabase(req, res) {
-    console.log(req.file);
     App.findByPk(req.params.appId)
       .then((app) => {
         return new Promise((resolve, reject) => {
           fs.mkdir(`uploads/${app.title}/db`, err => {
             if (err) { reject(err); }
 
-            fs.rename(req.file.path, `uploads/${app.title}/db/schema.sql`, (err) => {
-              if (err) { reject(err); }
+            if (!req.file) {
               resolve(app);
-            });
+            } else {
+              fs.rename(req.file.path, `uploads/${app.title}/db/schema.sql`, (err) => {
+                if (err) { reject(err); }
+                resolve(app);
+              });
+            }
+          });
+        });
+      })
+      .then((app) => {
+        return new Promise((resolve, reject) => {
+          Database.create({
+            service_name: `${app.title}_database`,
+            app_id: app.id,
+            network: app.network,
+            volume: `${app.title}_db_data`,
+          }).then((database) => {
+            return app.setDatabase(database)
+          }).then(() => {
+            resolve(app);
           });
         });
       })
