@@ -2,6 +2,7 @@ const DockerWrapper = require('../lib/DockerWrapper');
 const App = require('../server/models').App;
 const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
+const { execSync } = require('child_process');
 
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
@@ -19,6 +20,29 @@ const moveApplicationFile = (req) => {
     });
   });
 };
+
+const inflateZipFile = (path, filename) => {
+  return (app) => {
+  	return new Promise((resolve, reject) => {
+  	  console.log('Inflating zip file...');
+  	  // make a subdirectory
+  	  // what if it's already been deployed
+  	  execSync(`unzip -o ./${path}/${filename}`);
+	  execSync(`rm -rf ./${path}/${filename}/{.git|.env|node_modules}`)
+  	  resolve(app);
+  	})
+  }
+}
+
+const compressFiles = (directory) => {
+  return (app) => {
+  	return new Promise((resolve, reject) => {
+  	  console.log('Compressing files into zip');
+  	  execSync(`zip -r app.zip * .*`);
+  	  resolve(app);
+  	})
+  }
+}
 
 module.exports = {
   async create(req, res) {
@@ -53,8 +77,9 @@ module.exports = {
         res.render('apps/new', { errors: error.errors });
         throw error;
       })
-      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
-      .then(DockerWrapper.buildDockerignoreFile())
+      .then(inflateZipFile(app.path, req.file.filename + '.zip'))
+      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))  //  .then(DockerWrapper.buildDockerignoreFile())
+      .then(compressFiles(app.path))
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.createNetwork)
       .then(DockerWrapper.createService)
