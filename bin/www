@@ -34,7 +34,7 @@ wsAppHealth.on('connection', async function connection(ws, request) {
 
   const healthChecker = setInterval(async() => {
     const healthy = await DockerWrapper.appIsHealthy(appId);
-    ws.send(healthy ? 'healthy' : 'unhealthy');
+    ws.send(healthy ? 'Healthy' : 'Unhealthy');
   }, 1000);
 
   ws.on('close', () => clearInterval(healthChecker));
