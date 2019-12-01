@@ -134,13 +134,18 @@
 <!-- Environment Variables -->
 <div class="box">
   <details>
-    <summary>Custom Environment Variables</summary>
+    <summary>Environment Variables
+      {{#if app.envVariables.length}}
+        <span class="tag is-rounded is-link is-light flex-float-right">{{ app.envVariables.length }}</span>
+      {{/if}}
+    </summary>
 
     <div class="content">
       <form method="POST" action="/apps/{{ app.id }}/env">
         <table>
           <tr>
             <th>Key</th>
+            <th>Value</th>
             <th></th>
           </tr>
           {{#if app.envVariables.length}}
@@ -149,12 +154,21 @@
                 <td>
                   <div class="field">
                     <div class="control">
-                      <input class="input" type="text" value={{this}} name="env-{{@index}}" />
+                      <input class="input is-family-monospace" type="text" value="{{envKey this}}" name="{{@index}}[key]" />
                     </div>
                   </div>
                 </td>
                 <td>
-                  <a class="delete env is-small" data-delete-id="#env-{{@index}}"></a>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-family-monospace" type="text" value="{{envVal this}}" name="{{@index}}[val]" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-list-action-container">
+                    <a class="delete env" data-delete-id="#env-{{@index}}"></a>
+                  </div>
                 </td>
               </tr>
             {{/each}}
@@ -163,14 +177,25 @@
             <td>
               <div class="field">
                 <div class="control">
-                  <input class="input" type="input" type="text" name="env-{{app.envVariables.length}}"
+                  <input class="input is-family-monospace" type="input" type="text" name="{{app.envVariables.length}}[key]" />
                 </div>
               </div>
             </td>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input is-family-monospace" type="input" type="text" name="{{app.envVariables.length}}[val]" />
+                </div>
+              </div>
+            </td>
+            <td></td>
           </tr>
         </table>
+
+        <hr/>
+
         <div class="field is-grouped">
-          <p class="control">
+          <p class="control flex-float-right">
             <input class="button is-link" type="submit" value="Save" />
           </p>
         </div>
