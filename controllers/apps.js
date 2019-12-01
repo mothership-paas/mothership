@@ -171,10 +171,12 @@ module.exports = {
   },
 
   updateEnvVar(req, res) {
-    let envVariables = Object.values(req.body).filter(envVar => envVar.indexOf('=') > -1);
+    const submittedEnvVars = Object.keys(req.body).map(key => req.body[key]);
+    const validEnvVars = submittedEnvVars.filter(env => env.key.trim().length && env.val.trim().length);
+    const formattedEnvVars = validEnvVars.map(env => `${env.key.trim()}=${env.val.trim()}`)
 
     App.findByPk(req.params.appId)
-      .then(app => app.update({ envVariables }))
+      .then(app => app.update({ envVariables: formattedEnvVars }))
       .then(DockerWrapper.updateService())
       .then((app) => {
         res.redirect(`/apps/${req.params.appId}`);
