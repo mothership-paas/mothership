@@ -131,6 +131,54 @@
   </details>
 </div>
 
+<!-- Environment Variables -->
+<div class="box">
+  <details>
+    <summary>Custom Environment Variables</summary>
+
+    <div class="content">
+      <form method="POST" action="/apps/{{ app.id }}/env">
+        <table>
+          <tr>
+            <th>Key</th>
+            <th></th>
+          </tr>
+          {{#if app.envVariables.length}}
+            {{#each app.envVariables }}
+              <tr id="env-{{@index}}">
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input" type="text" value={{this}} name="env-{{@index}}" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <a class="delete env is-small" data-delete-id="#env-{{@index}}"></a>
+                </td>
+              </tr>
+            {{/each}}
+          {{/if}}
+          <tr>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="input" type="text" name="env-{{app.envVariables.length}}"
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div class="field is-grouped">
+          <p class="control">
+            <input class="button is-link" type="submit" value="Save" />
+          </p>
+        </div>
+      </form>
+    </div>
+  </details>
+</div>
+
 <!-- Scaling -->
 <div class="box">
   <details>
@@ -252,5 +300,19 @@
       });
 
     });
+
+    // Env Variables
+
+    let removeEnvVariable = (evt) => {
+      evt.stopPropagation();
+      const elementId = evt.target.getAttribute('data-delete-id');
+      const element = document.querySelector(elementId);
+      element.parentNode.removeChild(element);
+    }
+
+    const deleteEnvButtons = document.querySelectorAll(".delete.env");
+    for (const button of deleteEnvButtons) {
+      button.addEventListener('click', removeEnvVariable);
+    }
   })();
 </script>
