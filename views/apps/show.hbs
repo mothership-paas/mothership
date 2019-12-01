@@ -205,13 +205,14 @@
   (() => {
     // Update schema file upload field to reflect name of uploaded file
     const fileInput = document.querySelector('#file-js-example input[type=file]');
-    fileInput.onchange = () => {
-      if (fileInput.files.length > 0) {
-        const fileName = document.querySelector('#file-js-example .file-name');
-        fileName.textContent = fileInput.files[0].name;
+    if (fileInput) {
+      fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+          const fileName = document.querySelector('#file-js-example .file-name');
+          fileName.textContent = fileInput.files[0].name;
+        }
       }
     }
-
     // Build terminal
     const terminalWrapper = document.getElementById('build-terminal');
     const terminal = document.querySelector('#build-terminal .terminal');
