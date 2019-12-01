@@ -39,7 +39,12 @@
 <!-- App Database -->
 <div class="box">
   <details>
-    <summary>Database</summary>
+    <summary>
+      Database
+      {{#if app.database}}
+        <span class="tag is-rounded is-link is-light flex-float-right">Enabled</span>
+      {{/if}}
+    </summary>
 
     <div class="content">
       {{#if app.database}}
