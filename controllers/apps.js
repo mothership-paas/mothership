@@ -169,4 +169,17 @@ module.exports = {
       .then(DockerWrapper.updateService(serviceConfig))
       .catch(error => console.log(error));
   },
+
+  updateEnvVar(req, res) {
+    let envVariables = Object.values(req.body).filter(envVar => envVar.indexOf('=') > -1);
+
+    App.findByPk(req.params.appId)
+      .then(app => app.update({ envVariables }))
+      .then(DockerWrapper.updateService())
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`);
+        return app;
+      })
+      .catch(error => console.log(error))
+  },
 };
