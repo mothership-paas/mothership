@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     filename: DataTypes.STRING,
     network: DataTypes.STRING,
     url: DataTypes.STRING,
+    envVariables: DataTypes.ARRAY(DataTypes.TEXT),
     replicas: {
       type: DataTypes.INTEGER,
       defaultValue: 1,
