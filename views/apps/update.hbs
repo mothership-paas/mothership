@@ -23,6 +23,16 @@
       {{/if}}
 
       <form method="POST" action="/apps/update/{{app.id}}" enctype="multipart/form-data">
+
+        <div class="field" hidden>
+          <label class="label">Name</label>
+
+          <div class="control">
+            <input class="input" type="text" name="title" value="{{ app.title }}" placeholder="my-new-app" />
+          </div>
+        </div>
+
+
         <div class="field">
           <label class="label">Application File</label>
           <div id="file-js-example" class="file has-name">
