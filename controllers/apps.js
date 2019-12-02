@@ -63,6 +63,10 @@ module.exports = {
       .catch(error => { console.log(error); });
   },
 
+  update(req, res) {
+    console.log('updating application', req.file.filename);
+  },
+
   list(req, res) {
     return App.findAll()
       .then(apps => {
@@ -91,6 +95,23 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
+
+  showUpdatePage(req, res) {
+    return App
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
+      .then(app => {
+        if (!app) {
+          return res.status(404).send({
+            message: 'App Not Found'
+          });
+        }
+
+        res.render('apps/update', { app });
+      })
+      .catch(error => res.status(400).send(error));
+  },    
 
   destroy(req, res) {
     return App
