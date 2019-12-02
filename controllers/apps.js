@@ -153,11 +153,11 @@ module.exports = {
           });
         }
         return app
-          .destroy()
-          .then(() => res.redirect('/apps'))
-          .catch((error) => res.status(400).send(error))
-      })
-      .catch(error => res.status(400).send(error));
+      }
+      .then(DockerWrapper.destroyService)
+      .then(DockerWrapper.destroyNetwork)
+      .then(() => res.redirect('/apps'))
+      .catch((error) => res.status(400).send(error))
   },
 
   createDatabase(req, res) {
