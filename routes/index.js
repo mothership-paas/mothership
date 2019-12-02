@@ -5,6 +5,8 @@ const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
 const stream = require('stream');
+const util = require('util');
+const WebSocket = require('ws');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;
@@ -100,6 +102,10 @@ router.post('/apps/:appId/exec', (req, res) => {
       res.send(200, 'OK');
     })
     .catch(error => res.status(404).send(error));
+});
+
+router.get('/terminal', (req, res) => {
+  return res.render('apps/terminal');
 });
 
 module.exports = router;
