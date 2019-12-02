@@ -38,6 +38,7 @@ router.get('/events/:appId/exec', eventLogger.appExecEvents);
 router.get('/apps', appsController.list);
 router.get('/apps/new', appsController.new);
 router.get('/apps/:appId', appsController.show);
+router.get('/apps/update/:appId', appsController.showUpdatePage);
 router.post('/apps', upload.single('file'), appsController.create);
 router.delete('/apps/:appId', appsController.destroy);
 
