@@ -29,7 +29,11 @@
           <a href="http://{{ app.url }}" target="_blank">
             {{ app.url }}
           </a>
-
+        </p>
+        
+        <p>
+          <strong>Health:</strong>
+          <span class="tag" id="app-health"></span>
         </p>
       </div>
     </details>
@@ -39,7 +43,12 @@
 <!-- App Database -->
 <div class="box">
   <details>
-    <summary>Database</summary>
+    <summary>
+      Database
+      {{#if app.database}}
+        <span class="tag is-rounded is-link is-light flex-float-right">Enabled</span>
+      {{/if}}
+    </summary>
 
     <div class="content">
       {{#if app.database}}
@@ -131,6 +140,79 @@
   </details>
 </div>
 
+<!-- Environment Variables -->
+<div class="box">
+  <details>
+    <summary>Environment Variables
+      {{#if app.envVariables.length}}
+        <span class="tag is-rounded is-link is-light flex-float-right">{{ app.envVariables.length }}</span>
+      {{/if}}
+    </summary>
+
+    <div class="content">
+      <form method="POST" action="/apps/{{ app.id }}/env">
+        <table>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th></th>
+          </tr>
+          {{#if app.envVariables.length}}
+            {{#each app.envVariables }}
+              <tr id="env-{{@index}}">
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-family-monospace" type="text" value="{{envKey this}}" name="{{@index}}[key]" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-family-monospace" type="text" value="{{envVal this}}" name="{{@index}}[val]" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-list-action-container">
+                    <a class="delete env" data-delete-id="#env-{{@index}}"></a>
+                  </div>
+                </td>
+              </tr>
+            {{/each}}
+          {{/if}}
+          <tr>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input is-family-monospace" type="input" type="text" name="{{newEnvIndex app.envVariables}}[key]" />
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input is-family-monospace" type="input" type="text" name="{{newEnvIndex app.envVariables}}[val]" />
+                </div>
+              </div>
+            </td>
+            <td></td>
+          </tr>
+        </table>
+
+        <hr/>
+
+        <div class="field is-grouped">
+          <p class="control flex-float-right">
+            <input class="button is-link" type="submit" value="Save" />
+          </p>
+        </div>
+      </form>
+    </div>
+  </details>
+</div>
+
 <!-- Scaling -->
 <div class="box">
   <details>
@@ -154,6 +236,29 @@
 </div>
 
 <script>
+  // WebSocket for updating app health
+  (() => {
+    document.addEventListener('DOMContentLoaded', function() {
+      const output = document.getElementById('app-health');
+      const websocket = new WebSocket(
+        `ws://${window.location.host}/app-health?appId={{app.id}}`
+      );
+
+      websocket.onopen = () => console.log('Connected to app-health');
+      websocket.onerror = (event) => console.log(event.data);
+      websocket.onclose = () => console.log('Disconnected from app-health');
+      websocket.onmessage = (event) => {
+        if (event.data === 'Healthy') {
+          output.classList.add('is-success');
+        } else {
+          output.classList.add('is-danger');
+        }
+        output.innerHTML = event.data;
+      }
+    });
+  })();
+
+  // Handling build and exec output
   (() => {
     // Update schema file upload field to reflect name of uploaded file
     const fileInput = document.querySelector('#file-js-example input[type=file]');
@@ -163,9 +268,8 @@
           const fileName = document.querySelector('#file-js-example .file-name');
           fileName.textContent = fileInput.files[0].name;
         }
-      }  
+      }
     }
-
     // Build terminal
     const terminalWrapper = document.getElementById('build-terminal');
     const terminal = document.querySelector('#build-terminal .terminal');
@@ -254,5 +358,19 @@
       });
 
     });
+
+    // Env Variables
+
+    let removeEnvVariable = (evt) => {
+      evt.stopPropagation();
+      const elementId = evt.target.getAttribute('data-delete-id');
+      const element = document.querySelector(elementId);
+      element.parentNode.removeChild(element);
+    }
+
+    const deleteEnvButtons = document.querySelectorAll(".delete.env");
+    for (const button of deleteEnvButtons) {
+      button.addEventListener('click', removeEnvVariable);
+    }
   })();
 </script>

@@ -45,6 +45,8 @@ router.post('/apps/:appId/edit', upload.single('file'), appsController.update);
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
 
+// Env Variables
+router.post('/apps/:appId/env', appsController.updateEnvVar);
 // Scale/Replicas
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
@@ -71,7 +73,7 @@ router.post('/apps/:appId/exec', (req, res) => {
         });
       });
 
-      const runOptions =  { 
+      const runOptions =  {
         Env: [
           // TODO: These shouldn't be hard-coded... store in db?
           `DATABASE_HOST=${app.title}_database`,
