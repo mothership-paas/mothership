@@ -235,7 +235,11 @@
         console.log('Disconnected from test')
       };
       websocket.onmessage = (event) => {
-        event.data.text()
+        // Data is sent back as a Blob, and Safari doesn't
+        // support Blob.prototype.text(), so we wrapt it in
+        // a response object and extract the text from that
+        const response = new Response(event.data);
+        response.text()
           .then((text) => {
             if (text === 'container ready') {
               progressBar.style.display = "none";
