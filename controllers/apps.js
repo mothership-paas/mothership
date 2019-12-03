@@ -78,16 +78,16 @@ module.exports = {
     await moveApplicationFile(req);
 
     App
-       .findByPk(req.params.appId)
-       .then((app) => app.update({ filename: app.filename }))
-       .then((app) => {
-          return new Promise(async(resolve, reject) => {
+      .findByPk(req.params.appId)
+      .then((app) => app.update({ filename: app.filename }))
+      .then((app) => {
+        return new Promise(async(resolve, reject) => {
           
           app.emitEvent(`Updating application '${app.title}'`);
           res.redirect(`/apps/${app.id}?events`);
           resolve(app);
         });
-       })
+      })
       .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.updateService)
