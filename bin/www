@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('paas:server');
 var http = require('http');
+var upgradeToWebSocket = require('../lib/WebSocket');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,12 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Handle websocket upgrades, pass to appropriate WebSocket Server
+ */
+
+server.on('upgrade', upgradeToWebSocket);
 
 /**
  * Listen on provided port, on all network interfaces.
