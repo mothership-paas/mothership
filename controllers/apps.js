@@ -153,7 +153,7 @@ module.exports = {
           });
         }
         return app
-      }
+      })
       .then(DockerWrapper.destroyService)
       .then(DockerWrapper.destroyNetwork)
       .then(() => res.redirect('/apps'))
