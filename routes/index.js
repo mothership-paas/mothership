@@ -5,6 +5,8 @@ const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
 const stream = require('stream');
+const util = require('util');
+const WebSocket = require('ws');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;

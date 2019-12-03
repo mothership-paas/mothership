@@ -110,32 +110,43 @@
 <!-- Command Runner -->
 <div class="box">
   <details>
-    <summary>Run Commands</summary>
+    <summary>Console</summary>
 
     <div class="content">
-      <p>
-        Run command in {{app.title}} app:
-        <form id="exec-form">
-
-          <div class="field has-addons">
-            <div class="control">
-              <input id="command" class="input" type="text" name="command" placeholder="bundle install">
-            </div>
-
-            <div class="control">
-              <button type="submit" class="button is-info">
-                Run
-              </button>
-            </div>
+      <form id="exec-form">
+        <p>
+          Run a command in your app and view the output in a console (e.g.
+          <code>rake db:migrate</code>). Interactive commands work too 
+          (e.g. <code>bash</code>). Please note that your command runs in 
+          a one-off container, so filesystem changes are not persistent. 
+        </p>
+        <div class="field has-addons">
+          <div class="control">
+            <input id="command" class="input" type="text" name="command" placeholder="bash">
           </div>
-        </form>
-      </p>
 
-      <div id="exec-terminal" class="terminal-wrapper" style="display: none">
-        <details open="true">
-          <pre class="terminal"></pre>
-        </details>
+          <div class="control">
+            <button type="submit" class="button is-info">
+              Run
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="terminal-modal" class="modal">
+        <div class="modal-background"></div>
+        <section class="modal-content">
+          <progress 
+            id="terminal-loading"
+            class="progress is-large is-info"
+            style="display: none"
+            max="100"
+          ></progress>
+          <div id="terminal"></div>
+        </section>
+        <button class="modal-close is-large" aria-label="close"></button>
       </div>
+      
     </div>
   </details>
 </div>
@@ -223,7 +234,6 @@
     </div>
 
     <div class="content">
-
       <form method="POST" action="/apps/{{ app.id }}/scale">
         <label>
           Instances: <input type="number" name="scale" value="{{ app.replicas }}" />
@@ -235,6 +245,9 @@
   </details>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/attach/attach.js" integrity="sha256-5bwn4N3wNwa0EPpTwE8fJlb6yXRD6MH7r+H86hfFmI8=" crossorigin="anonymous"></script>
 <script>
   // WebSocket for updating app health
   (() => {
@@ -258,7 +271,71 @@
     });
   })();
 
-  // Handling build and exec output
+  // App console
+  (() => {
+    Terminal.applyAddon(attach);
+    Terminal.applyAddon(fit);
+
+    const terminalModal = document.getElementById('terminal-modal');
+    const terminalModalBackground = document.querySelector('#terminal-modal .modal-background');
+    const submitButton = document.querySelector('#exec-form .button');
+    const progressBar = document.getElementById('terminal-loading');
+    let term;
+    let websocket;
+
+    terminalModalBackground.addEventListener('click', function (event) {
+      terminalModal.classList.remove('is-active');
+      progressBar.style.display = "none";
+      websocket.close();
+      document.getElementById('terminal').innerHTML = '';
+    });
+
+    submitButton.addEventListener('click', function (event) {
+      event.preventDefault();
+
+      terminalModal.classList.add('is-active');
+      const command = document.querySelector('#exec-form .input').value;
+      document.querySelector('#exec-form .input').value = null;
+      progressBar.style.display = "block";
+      
+      websocket = new WebSocket(
+        `ws://localhost:3000/terminal?appTitle={{app.title}}&command=${command}`
+      );
+
+      term = new Terminal({ cursorBlink: true });
+
+      websocket.onopen = () => {
+        console.log('Connected to test');
+      };
+      websocket.onerror = (event) => console.log(event.data);
+      websocket.onclose = () => {
+        // TODO: hide cursor
+        console.log('Disconnected from test')
+      };
+      websocket.onmessage = (event) => {
+        // Data is sent back as a Blob, and Safari doesn't
+        // support Blob.prototype.text(), so we wrapt it in
+        // a response object and extract the text from that
+        const response = new Response(event.data);
+        response.text()
+          .then((text) => {
+            if (text === 'container ready') {
+              progressBar.style.display = "none";
+              term.open(document.getElementById('terminal'));
+              term.focus();
+              term.on('data', data => {
+                websocket.send(data);
+              });
+            } else {
+              term.write(text);
+            }
+          })
+          .catch(console.log);
+      }
+    });
+  })();
+
+  // Handling build output
   (() => {
     // Update schema file upload field to reflect name of uploaded file
     const fileInput = document.querySelector('#file-js-example input[type=file]');
@@ -319,58 +396,6 @@
 
       appEventEndpoint.addEventListener('message', messageHandler);
       appEventEndpoint.addEventListener('error', errorHandler);
-    }
-
-    // Exec Terminal
-    const execForm = document.getElementById('exec-form');
-    const submitButton = document.querySelector('#exec-form .button');
-
-    submitButton.addEventListener('click', function (event) {
-      event.preventDefault();
-
-      const command = document.querySelector('#exec-form .input').value;
-      const execTerminalWrapper = document.getElementById('exec-terminal');
-      const appEventEndpoint = new EventSource('/events/{{ app.id }}/exec');
-
-      fetch('/apps/{{ app.id }}/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'command=' + encodeURIComponent(command),
-      })
-
-      execTerminalWrapper.style.display = 'block';
-      const execTerminal = document.querySelector('#exec-terminal .terminal');
-
-      appEventEndpoint.addEventListener('message', function (message) {
-        if (event.lastEventId === '-1') {
-          appEventEndpoint.close();
-          execTerminal.style.display = 'none';
-          console.log('stopped listening');
-          return;
-        }
-        message = JSON.parse(message.data);
-        message = message.join('\n');
-        console.log(message);
-        execTerminal.innerHTML = message;
-        execTerminal.scrollTop = execTerminal.scrollHeight;
-      });
-
-    });
-
-    // Env Variables
-
-    let removeEnvVariable = (evt) => {
-      evt.stopPropagation();
-      const elementId = evt.target.getAttribute('data-delete-id');
-      const element = document.querySelector(elementId);
-      element.parentNode.removeChild(element);
-    }
-
-    const deleteEnvButtons = document.querySelectorAll(".delete.env");
-    for (const button of deleteEnvButtons) {
-      button.addEventListener('click', removeEnvVariable);
     }
   })();
 </script>
