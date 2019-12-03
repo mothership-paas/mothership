@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
+var expressHandlebars = require('express-handlebars');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -18,13 +19,19 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+app.engine('.hbs', expressHandlebars({
+  extname: '.hbs',
+  layoutsDir: './views',
+  defaultLayout: 'layout',
+  helpers: require('./lib/HandlebarsHelpers')
+}));
 
 // logger setup
 app.use(logger('dev'));
 
 // parsing setup
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // stylesheet setup

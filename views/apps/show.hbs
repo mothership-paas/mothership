@@ -43,7 +43,12 @@
 <!-- App Database -->
 <div class="box">
   <details>
-    <summary>Database</summary>
+    <summary>
+      Database
+      {{#if app.database}}
+        <span class="tag is-rounded is-link is-light flex-float-right">Enabled</span>
+      {{/if}}
+    </summary>
 
     <div class="content">
       {{#if app.database}}
@@ -146,6 +151,79 @@
   </details>
 </div>
 
+<!-- Environment Variables -->
+<div class="box">
+  <details>
+    <summary>Environment Variables
+      {{#if app.envVariables.length}}
+        <span class="tag is-rounded is-link is-light flex-float-right">{{ app.envVariables.length }}</span>
+      {{/if}}
+    </summary>
+
+    <div class="content">
+      <form method="POST" action="/apps/{{ app.id }}/env">
+        <table>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+            <th></th>
+          </tr>
+          {{#if app.envVariables.length}}
+            {{#each app.envVariables }}
+              <tr id="env-{{@index}}">
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-family-monospace" type="text" value="{{envKey this}}" name="{{@index}}[key]" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-family-monospace" type="text" value="{{envVal this}}" name="{{@index}}[val]" />
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-list-action-container">
+                    <a class="delete env" data-delete-id="#env-{{@index}}"></a>
+                  </div>
+                </td>
+              </tr>
+            {{/each}}
+          {{/if}}
+          <tr>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input is-family-monospace" type="input" type="text" name="{{newEnvIndex app.envVariables}}[key]" />
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="field">
+                <div class="control">
+                  <input class="input is-family-monospace" type="input" type="text" name="{{newEnvIndex app.envVariables}}[val]" />
+                </div>
+              </div>
+            </td>
+            <td></td>
+          </tr>
+        </table>
+
+        <hr/>
+
+        <div class="field is-grouped">
+          <p class="control flex-float-right">
+            <input class="button is-link" type="submit" value="Save" />
+          </p>
+        </div>
+      </form>
+    </div>
+  </details>
+</div>
+
 <!-- Scaling -->
 <div class="box">
   <details>
@@ -176,7 +254,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const output = document.getElementById('app-health');
       const websocket = new WebSocket(
-        'ws://localhost:3000/app-health?appId={{app.id}}'
+        `ws://${window.location.host}/app-health?appId={{app.id}}`
       );
 
       websocket.onopen = () => console.log('Connected to app-health');
@@ -261,13 +339,14 @@
   (() => {
     // Update schema file upload field to reflect name of uploaded file
     const fileInput = document.querySelector('#file-js-example input[type=file]');
-    fileInput.onchange = () => {
-      if (fileInput.files.length > 0) {
-        const fileName = document.querySelector('#file-js-example .file-name');
-        fileName.textContent = fileInput.files[0].name;
+    if (fileInput) {
+      fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+          const fileName = document.querySelector('#file-js-example .file-name');
+          fileName.textContent = fileInput.files[0].name;
+        }
       }
     }
-
     // Build terminal
     const terminalWrapper = document.getElementById('build-terminal');
     const terminal = document.querySelector('#build-terminal .terminal');
