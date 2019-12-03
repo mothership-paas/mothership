@@ -106,8 +106,4 @@ router.post('/apps/:appId/exec', (req, res) => {
     .catch(error => res.status(404).send(error));
 });
 
-router.get('/terminal', (req, res) => {
-  return res.render('apps/terminal');
-});
-
 module.exports = router;
