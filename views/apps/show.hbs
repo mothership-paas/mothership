@@ -29,7 +29,11 @@
           <a href="http://{{ app.url }}" target="_blank">
             {{ app.url }}
           </a>
-
+        </p>
+        
+        <p>
+          <strong>Health:</strong>
+          <span class="tag" id="app-health"></span>
         </p>
       </div>
     </details>
@@ -232,6 +236,29 @@
 </div>
 
 <script>
+  // WebSocket for updating app health
+  (() => {
+    document.addEventListener('DOMContentLoaded', function() {
+      const output = document.getElementById('app-health');
+      const websocket = new WebSocket(
+        `ws://${window.location.host}/app-health?appId={{app.id}}`
+      );
+
+      websocket.onopen = () => console.log('Connected to app-health');
+      websocket.onerror = (event) => console.log(event.data);
+      websocket.onclose = () => console.log('Disconnected from app-health');
+      websocket.onmessage = (event) => {
+        if (event.data === 'Healthy') {
+          output.classList.add('is-success');
+        } else {
+          output.classList.add('is-danger');
+        }
+        output.innerHTML = event.data;
+      }
+    });
+  })();
+
+  // Handling build and exec output
   (() => {
     // Update schema file upload field to reflect name of uploaded file
     const fileInput = document.querySelector('#file-js-example input[type=file]');
