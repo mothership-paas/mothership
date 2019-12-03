@@ -65,30 +65,34 @@ module.exports = {
 
   async update(req, res) {
     if (!req.file || req.file.mimetype !== 'application/zip') {
-      return res.render('apps/update', { errors: [{ message: 'Please attach a .zip file of your application.' }] })
+      return res.render('apps/update', 
+        { errors: [
+          { message: 'Please attach a .zip file of your application.' }
+          ],
+          app: app,
+       });
     }
 
     await moveApplicationFile(req);
 
     App
-     .findByPk(req.params.appId)
-     .then((app) => app.update({ filename: req.file.filename + '.zip' }))
-     .then((app) => {
+      .findByPk(req.params.appId)
+      .then((app) => app.update({ filename: req.file.filename + '.zip' }))
+      .then((app) => {
         return new Promise(async(resolve, reject) => {
-        
-        app.emitEvent(`Updating application '${app.title}'`);
-        res.redirect(`/apps/${app.id}?events`);
-        resolve(app);
-      });
-     })
-    .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
-    .then(DockerWrapper.buildImage)
-    .then(DockerWrapper.updateService())
-    .then((app) => {
-      app.emitEvent('===END===');
-    })
-    .catch(error => { console.log(error); });
-},
+          app.emitEvent(`Updating application '${app.title}'`);
+          res.redirect(`/apps/${app.id}?events`);
+          resolve(app);
+        });
+      })
+      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildImage)
+      .then(DockerWrapper.updateService())
+      .then((app) => {
+        app.emitEvent('===END===');
+      })
+      .catch(error => { console.log(error); });
+  },
 
   list(req, res) {
     return App.findAll()

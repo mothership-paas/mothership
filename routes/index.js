@@ -38,10 +38,9 @@ router.get('/events/:appId/exec', eventLogger.appExecEvents);
 router.get('/apps', appsController.list);
 router.get('/apps/new', appsController.new);
 router.get('/apps/:appId', appsController.show);
-router.get('/apps/update/:appId', appsController.showUpdatePage);
+router.get('/apps/:appId/edit', appsController.showUpdatePage);
 router.post('/apps', upload.single('file'), appsController.create);
-router.post('/apps/update/:appId', upload.single('file'), appsController.update);
-router.post('/apps/delete/:appId', appsController.destroy);
+router.post('/apps/:appId/edit', upload.single('file'), appsController.update);
 
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
