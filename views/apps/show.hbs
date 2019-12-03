@@ -163,7 +163,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const output = document.getElementById('app-health');
       const websocket = new WebSocket(
-        'ws://localhost:3000/app-health?appId={{app.id}}'
+        `ws://${window.location.host}/app-health?appId={{app.id}}`
       );
 
       websocket.onopen = () => console.log('Connected to app-health');
