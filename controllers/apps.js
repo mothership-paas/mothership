@@ -174,6 +174,8 @@ module.exports = {
   },
 
   updateEnvVar(req, res) {
+    // TODO: may be worth refactoring this later to be less brittle if request formatting is bad
+    // just return an error to client if request body was formatted incorrectly
     const submittedEnvVars = Object.keys(req.body).map(key => req.body[key]);
     const validEnvVars = submittedEnvVars.filter(env => env.key.trim().length && env.val.trim().length);
     const formattedEnvVars = validEnvVars.map(env => `${env.key.trim()}=${env.val.trim()}`)
