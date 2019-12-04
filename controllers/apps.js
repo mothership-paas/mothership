@@ -7,11 +7,11 @@ const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
 
-const moveApplicationFile = (req) => {
+const moveApplicationFile = (req, app) => {
   return new Promise((resolve, reject) => {
-    const destination = `uploads/${req.body.title}/${req.file.filename}.zip`;
+    const destination = `uploads/${app.title}/${req.file.filename}.zip`;
 
-    fs.mkdir(`uploads/${req.body.title}`, (err) => {
+    fs.mkdir(`uploads/${app.title}`, (err) => {
       fs.rename(req.file.path, destination, (err) => {
         if (err) { reject(err) }
         resolve(req);
@@ -49,31 +49,52 @@ module.exports = {
       })
   },
 
-  async update(req, res) {
+  async deploy(req, res) {
+    const app = await App.findByPk(req.params.appId);
+    const isFirstDeploy = app.filename === null;
+
     if (!req.file || req.file.mimetype !== 'application/zip') {
-      return res.render('apps/update', 
-        { errors: [
-          { message: 'Please attach a .zip file of your application.' }
-          ],
-          app: app,
-       });
+      return res.render(`apps/show`, {
+        app: app,
+        errors: [{ message: 'Please attach a .zip file when deploying' }]
+      });
     }
 
-    await moveApplicationFile(req);
+    await moveApplicationFile(req, app);
 
-    App
-      .findByPk(req.params.appId)
-      .then((app) => app.update({ filename: req.file.filename + '.zip' }))
-      .then((app) => {
+    const updateParams = {
+      path: `uploads/${app.title}`,
+      filename: req.file.filename + '.zip',
+      network: `${app.title}_default`,
+    };
+
+    app.update(updateParams)
+      .then(app => {
         return new Promise(async(resolve, reject) => {
-          app.emitEvent(`Updating application '${app.title}'`);
-          res.redirect(`/apps/${app.id}?events`);
+          if (req.accepts('html')) {
+            res.redirect(`/apps/${app.id}?events`);
+          } else {
+            res.status(201).json({ stream: `/events/${app.id}` });
+          }
+          app.emitEvent(`Deploying application '${app.title}'...`);
           resolve(app);
         });
       })
-      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildDockerfile(app.filename))
       .then(DockerWrapper.buildImage)
-      .then(DockerWrapper.updateService())
+      .then((app) => {
+        return new Promise(async(resolve, reject) => {
+          if (isFirstDeploy) {
+            DockerWrapper.createNetwork(app)
+              .then(DockerWrapper.createService)
+              .then((app) => resolve(app))
+              .catch((err) => reject(err));
+          } else {
+            DockerWrapper.updateService()(app)
+              .then((app) => resolve(app));
+          }
+        })
+      })
       .then((app) => {
         app.emitEvent('===END===');
       })
