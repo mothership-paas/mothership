@@ -97,9 +97,18 @@ module.exports = {
   list(req, res) {
     return App.findAll()
       .then(apps => {
-        res.render('apps/index', { apps: apps });
-      })
-      .catch(error => res.status(400).send(error));
+        if (req.accepts('html')) {
+          res.render('apps/index', { apps: apps });
+        } else {
+          res.json({ apps });
+        }
+      }).catch(error => {
+        if (req.accepts('html')) {
+          res.status(400).send(error);
+        } else {
+          res.status(400).json({ error });
+        }
+      });
   },
 
   new(req, res) {
