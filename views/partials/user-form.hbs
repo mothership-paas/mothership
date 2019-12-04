@@ -1,0 +1,20 @@
+  <div>
+    <label>First name:</label>
+    <input type="text" name="firstname" value="{{user.firstName}}"/>
+  </div>
+  <div>
+    <label>Last name:</label>
+    <input type="text" name="lastname" value="{{user.lastName}}"/>
+  </div>
+  <div>
+    <label>Email:</label>
+    <input type="text" name="username" value="{{user.username}}"/>
+  </div>
+  <div>
+    <label>Password: {{passwordMessage}}</label>
+    <input type="password" name="password"/>
+  </div>
+  <div>
+    <button type="submit">{{submitText}}</button>
+    <a href="/users">Cancel</a>
+  </div>
