@@ -20,18 +20,18 @@ const moveApplicationFile = (req) => {
   });
 };
 
-const checkForDatabase = (app) => {
+const checkForDatabase = (req) => { // TODO: Should this be a promise?
   return new Promise((resolve, reject) => {
     Database
-      .findOne({ where: { app_id: app.id }})
-      .then((db_node) => {
-        if (db_node) {
-          resolve(app, true)
-        } else {
-          resolve(app, false)
-        }
-      });
-  }
+    .findOne({ where: { "app_id": app.id }})
+    .then((database) => {
+      if (database) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });  
+  });
 }
 
 module.exports = {
@@ -158,7 +158,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },    
 
-  delete(req, res) {
+  delete(req, res) { // TODO: remove queries from delete view
     return App
       .findByPk(req.params.appId, {
         include: [{model: Database, as: 'database'}]
@@ -186,22 +186,27 @@ module.exports = {
         }
         return app;
       })
-      .then(DockerWrapper.destroyService)
-      .then(DockerWrapper.destroyNetwork)
-      .then(checkForDatabase)
-      .then((app, databaseExists) => {
-        if (databaseExists) {
-          // DockerWrapper.destroyDatabase(app) // service name_database
-            // .then(DockerWrapper.destroyDatabaseVolume) // volume name + _db_data
-            // .then(removeDatabaseInfoFromDatabase) // sequelize call
-            // .then(app => resolve(app));
-            resolve(app);
-        } else {
-          resolve(app);
-        }
+      // .then(DockerWrapper.destroyService)
+      // .then(DockerWrapper.destroyNetwork)
+      .then((app) => {
+        Database
+          .findOne({ where: { "app_id": app.id }})
+          .then((database) => {
+            if (database) {
+              console.log('database exists');
+              // DockerWrapper.destroyDatabase(app) // service name_database
+                // .then(DockerWrapper.destroyDatabaseVolume) // volume name + _db_data
+                // .then(removeDatabaseInfoFromDatabase) // sequelize call
+                // .then(app => resolve(app));
+                return app;
+            } else {
+              console.log('database no exist');
+              return app;
+            }
+          })
       })
       // .then(removeAppFromDatabase)
-      .then(() => res.redirect('/apps/'))
+      .then(() => res.redirect('/apps'))
       .catch((error) => res.status(400).send(error))
   },
 

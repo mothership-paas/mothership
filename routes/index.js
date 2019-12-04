@@ -44,7 +44,7 @@ router.get('/apps/:appId/delete', appsController.delete);
 router.get('/apps/:appId/edit', appsController.showUpdatePage);
 router.post('/apps', upload.single('file'), appsController.create);
 router.post('/apps/:appId/edit', upload.single('file'), appsController.update);
-router.post('/apps/:appId/delete', upload.single('file'), appsController.destroy);
+router.post('/apps/:appId/delete', appsController.destroy);
 
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
