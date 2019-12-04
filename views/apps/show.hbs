@@ -33,7 +33,16 @@
 
         <p>
           <strong>Health:</strong>
-          <span class="tag" id="app-health"></span>
+          <span class="tag" id="app-health">Loading...</span>
+        </p>
+
+        <p>
+          <strong>Deployed:</strong>
+          {{#if app.deployed}}
+            {{ app.deployed }}
+          {{else}}
+            N/A
+          {{/if}}
         </p>
       </div>
     </details>
@@ -305,6 +314,11 @@
   (() => {
     document.addEventListener('DOMContentLoaded', function() {
       const output = document.getElementById('app-health');
+      if ('{{ app.deployed }}' === '') {
+        output.innerHTML = 'Not yet deployed';
+        return;
+      }
+
       const websocket = new WebSocket(
         `ws://${window.location.host}/app-health?appId={{app.id}}`
       );
