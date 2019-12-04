@@ -84,17 +84,17 @@ module.exports = {
       .then((app) => {
         return new Promise(async(resolve, reject) => {
           if (app.deployed) {
+            DockerWrapper.updateService()(app)
+              .then((app) => resolve(app));
+          } else {
             DockerWrapper.createNetwork(app)
               .then(DockerWrapper.createService)
               .then((app) => resolve(app))
               .catch((err) => reject(err));
-          } else {
-            DockerWrapper.updateService()(app)
-              .then((app) => resolve(app));
           }
         })
       })
-      .then(app.update({ deployed: Date.now() }))
+      .then((app) => app.update({ deployed: Date.now() }))
       .then((app) => {
         app.emitEvent('===END===');
       })
