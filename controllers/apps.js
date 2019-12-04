@@ -22,45 +22,31 @@ const moveApplicationFile = (req) => {
 
 module.exports = {
   async create(req, res) {
-    if (!req.file || req.file.mimetype !== 'application/zip') {
-      return res.render('apps/new', { errors: [{ message: 'Please attach a .zip file of your application.' }] })
-    }
+    const domain = await Config.findOne({
+      where: { key: 'domain' },
+    });
 
-    // TODO: Make path relative to app root directory
     const app = {
       title: req.body.title,
-      path: `uploads/${req.body.title}`,
-      filename: req.file.filename + '.zip',
-      network: `${req.body.title}_default`
+      url: `${req.body.title}.${domain.value}`
     };
-
-    await moveApplicationFile(req);
 
     App.create(app)
       .then((app) => {
-        // Set app subdomain now that we have id
-        return new Promise(async(resolve, reject) => {
-          const domain = await Config.findOne({
-            where: { key: 'domain' },
-          })
-          await app.update({ url: `${app.title}.${domain.value}` });
-          app.emitEvent(`Creating application '${app.title}'`)
-          res.redirect(`apps/${app.id}?events`);
-          resolve(app);
-        });
+        if (req.accepts('html')) {
+          res.redirect(`/apps/${app.id}`);
+        } else {
+          res.status(201).json({ app });
+        }
       })
       .catch(error => {
-        res.render('apps/new', { errors: error.errors });
+        if (req.accepts('html')) {
+          res.render('apps/new', { errors: error.errors });
+        } else {
+          res.status(400).json({ errors: error.errors });
+        }
         throw error;
       })
-      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
-      .then(DockerWrapper.buildImage)
-      .then(DockerWrapper.createNetwork)
-      .then(DockerWrapper.createService)
-      .then((app) => {
-        app.emitEvent('===END===');
-      })
-      .catch(error => { console.log(error); });
   },
 
   async update(req, res) {
