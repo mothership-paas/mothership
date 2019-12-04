@@ -191,14 +191,16 @@ module.exports = {
           });
         });
       })
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`)
+        return app;
+      })
       .then(DockerWrapper.createDatabase)
       .then(DockerWrapper.setDatabaseEnvVariablesForApp)
       .catch(error => {
         console.log(error);
         res.status(400).send(error);
       });
-
-    res.redirect('/apps');
   },
 
   updateReplicas(req, res) {
