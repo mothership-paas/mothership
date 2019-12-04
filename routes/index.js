@@ -8,12 +8,14 @@ const stream = require('stream');
 const util = require('util');
 const WebSocket = require('ws');
 const passport = require('passport');
+const bcrypt = require('bcrypt');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;
 
 const DockerWrapper = require('../lib/DockerWrapper');
 const App = require('../server/models').App;
+const User = require('../server/models').User;
 
 const storage = multer.diskStorage({
   // TODO: validate that the file is a zip
@@ -53,6 +55,60 @@ router.post(
 router.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/login');
+});
+
+
+// Users
+router.get('/users', async(req, res) => {
+  const users = await User.findAll();
+  res.render('users/index', { users });
+});
+
+router.get('/users/new', (req, res) => {
+  res.render('users/create');
+});
+
+router.post('/users', async(req, res) => {
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+  await User.create({
+    firstName: req.body.firstname,
+    lastName: req.body.lastname,
+    username: req.body.username,
+    password: hashedPassword,
+  });
+
+  res.redirect('/users');
+});
+
+router.get('/users/:userId/edit', async(req, res) => {
+  const user = await User.findByPk(req.params.userId);
+  res.render('users/edit', { user });
+});
+
+router.post('/users/:userId', async(req, res) => {
+  const user = await User.findByPk(req.params.userId);
+  const newProps = {
+    firstName: req.body.firstname,
+    lastName: req.body.lastname,
+    username: req.body.username,
+  };
+
+  // Only set password if they supplied a new one
+  if (req.body.password !== '') {
+    newProps.password = await bcrypt.hash(req.body.password, 10);
+  }
+
+  await user.update(newProps);
+
+  return res.redirect('/users');
+});
+
+router.post('/users/:userId/delete', async(req, res) => {
+  const user = await User.findByPk(req.params.userId);
+  await user.destroy();
+
+  return res.redirect('/users');
 });
 
 /* GET home page. */
