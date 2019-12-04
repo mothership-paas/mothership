@@ -40,9 +40,8 @@ router.get('/events/:appId/exec', eventLogger.appExecEvents);
 router.get('/apps', appsController.list);
 router.get('/apps/new', appsController.new);
 router.get('/apps/:appId', appsController.show);
-router.get('/apps/:appId/edit', appsController.showUpdatePage);
-router.post('/apps', upload.single('file'), appsController.create);
-router.post('/apps/:appId/edit', upload.single('file'), appsController.update);
+router.post('/apps', appsController.create);
+router.post('/apps/:appId/deploy', upload.single('file'), appsController.deploy);
 
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
