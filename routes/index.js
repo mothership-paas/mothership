@@ -27,6 +27,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage});
 
+// Authentication middleware
+router.use(function(req, res, next) {
+  if (req.path.match(/^\/api.*/) && !req.isAuthenticated()) {
+    res.status(403).send();
+  } else if (req.path !== '/login' && !req.isAuthenticated()) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+});
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.redirect('/apps');
