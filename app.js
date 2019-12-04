@@ -5,6 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
 var expressHandlebars = require('express-handlebars');
+const passport = require('passport');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const Strategy = require('passport-local').Strategy;
+const User = require('./server/models').User;
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -14,7 +19,46 @@ if (env === 'development') {
 
 var indexRouter = require('./routes/index');
 
+
 var app = express();
+
+// passport seetup
+passport.use(
+  new Strategy(function(username, password, cb) {
+    User.findAll({ where: { username: username }, })
+      .then(user => {
+        user = user[0];
+        if (!user) { return cb(null, false); }
+
+        if (!bcrypt.compareSync(password, user.password)) {
+          return cb(null, false);
+        }
+
+        return cb(null, user);
+      })
+      .catch(err => {
+        return cb(err);
+      })
+  })
+);
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user.id);
+});
+
+passport.deserializeUser(function(id, cb) {
+  User.findByPk(id)
+    .then(user  => cb(null, user))
+    .catch(err => cb(err));
+});
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -23,6 +67,7 @@ app.engine('.hbs', expressHandlebars({
   extname: '.hbs',
   layoutsDir: './views',
   defaultLayout: 'layout',
+  partialsDir: './views/partials/',
   helpers: require('./lib/HandlebarsHelpers')
 }));
 
@@ -43,8 +88,8 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 
+app.use('/', indexRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
