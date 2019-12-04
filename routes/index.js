@@ -7,6 +7,7 @@ const uuid = require('uuid/v1');
 const stream = require('stream');
 const util = require('util');
 const WebSocket = require('ws');
+const passport = require('passport');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;
@@ -37,6 +38,23 @@ router.use(function(req, res, next) {
     next();
   }
 });
+
+// Login
+router.get('/login',(req, res) =>  {
+  res.render('login')
+});
+
+router.post(
+  '/login',
+  passport.authenticate('local', { failureRedirect: '/login', }),
+  (req, res) => res.redirect('/')
+);
+
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/login');
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.redirect('/apps');
