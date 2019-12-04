@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'Password must be between 5 and 50 characters',
         }
       }
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     }
   }, {});
   User.associate = function(models) {
