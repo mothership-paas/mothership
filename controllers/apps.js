@@ -51,7 +51,6 @@ module.exports = {
 
   async deploy(req, res) {
     const app = await App.findByPk(req.params.appId);
-    const isFirstDeploy = app.filename === null;
 
     if (!req.file || req.file.mimetype !== 'application/zip') {
       return res.render(`apps/show`, {
@@ -84,7 +83,7 @@ module.exports = {
       .then(DockerWrapper.buildImage)
       .then((app) => {
         return new Promise(async(resolve, reject) => {
-          if (isFirstDeploy) {
+          if (app.deployed) {
             DockerWrapper.createNetwork(app)
               .then(DockerWrapper.createService)
               .then((app) => resolve(app))
@@ -95,6 +94,7 @@ module.exports = {
           }
         })
       })
+      .then(app.update({ deployed: Date.now() }))
       .then((app) => {
         app.emitEvent('===END===');
       })
