@@ -70,15 +70,30 @@ router.get('/users/new', (req, res) => {
 
 router.post('/users', async(req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-  await User.create({
+  const userProps = {
     firstName: req.body.firstname,
     lastName: req.body.lastname,
     username: req.body.username,
     password: hashedPassword,
-  });
+  }
 
-  res.redirect('/users');
+  try {
+    // Password validation: we can't do this in the model because
+    // it's hashed before the model tries to write ito the db
+    if (!req.body.password || req.body.password.length < 5) {
+      errObject = {
+        errors: [{ message: "Password must be at least 5 characters" }],
+      };
+      throw errObject;
+    }
+
+    await User.create(userProps);
+
+    res.redirect('/users');
+  } catch(err) {
+    delete userProps.password;
+    res.render('users/create', { user: userProps, errors: err.errors });
+  }
 });
 
 router.get('/users/:userId/edit', async(req, res) => {
@@ -94,14 +109,24 @@ router.post('/users/:userId', async(req, res) => {
     username: req.body.username,
   };
 
-  // Only set password if they supplied a new one
-  if (req.body.password !== '') {
-    newProps.password = await bcrypt.hash(req.body.password, 10);
+  try {
+    if (req.body.password && req.body.password.length < 5) {
+      errObject = {
+        errors: [{ message: "Password must be at least 5 characters" }],
+      };
+      throw errObject;
+    }
+
+    // Only set password if they supplied a new one
+    if (req.body.password !== '') {
+      newProps.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    await user.update(newProps);
+    return res.redirect('/users');
+  } catch(err) {
+    res.render('users/create', { user: newProps, errors: err.errors });
   }
-
-  await user.update(newProps);
-
-  return res.redirect('/users');
 });
 
 router.post('/users/:userId/delete', async(req, res) => {
