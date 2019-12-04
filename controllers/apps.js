@@ -20,6 +20,20 @@ const moveApplicationFile = (req) => {
   });
 };
 
+const checkForDatabase = (app) => {
+  return new Promise((resolve, reject) => {
+    Database
+      .findOne({ where: { app_id: app.id }})
+      .then((db_node) => {
+        if (db_node) {
+          resolve(app, true)
+        } else {
+          resolve(app, false)
+        }
+      });
+  }
+}
+
 module.exports = {
   async create(req, res) {
     if (!req.file || req.file.mimetype !== 'application/zip') {
@@ -88,6 +102,7 @@ module.exports = {
       .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.updateService())
+      .then(checkForDatabase)
       .then((app) => {
         app.emitEvent('===END===');
       })
@@ -161,7 +176,7 @@ module.exports = {
   },
 
   destroy(req, res) {
-    return App
+    App
       .findByPk(req.params.appId)
       .then(app => {
         if (!app) {
@@ -169,11 +184,24 @@ module.exports = {
             message: 'App Not Found',
           });
         }
-        return app
+        return app;
       })
       .then(DockerWrapper.destroyService)
       .then(DockerWrapper.destroyNetwork)
-      .then(() => res.redirect('/apps'))
+      .then(checkForDatabase)
+      .then((app, databaseExists) => {
+        if (databaseExists) {
+          // DockerWrapper.destroyDatabase(app) // service name_database
+            // .then(DockerWrapper.destroyDatabaseVolume) // volume name + _db_data
+            // .then(removeDatabaseInfoFromDatabase) // sequelize call
+            // .then(app => resolve(app));
+            resolve(app);
+        } else {
+          resolve(app);
+        }
+      })
+      // .then(removeAppFromDatabase)
+      .then(() => res.redirect('/apps/'))
       .catch((error) => res.status(400).send(error))
   },
 
