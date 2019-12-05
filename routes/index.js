@@ -9,6 +9,7 @@ const util = require('util');
 const WebSocket = require('ws');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+const jwt = require('json-web-token');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;
@@ -32,13 +33,16 @@ const upload = multer({storage});
 
 // Authentication middleware
 router.use(function(req, res, next) {
-  if (req.path.match(/^\/api.*/) && !req.isAuthenticated()) {
-    res.status(403).send();
-    res.end()
-  } else if (req.path !== '/login' && !req.isAuthenticated()) {
-    res.redirect('/login');
-  } else {
+  if (req.path === '/api/login' || req.path === '/login') {
     next();
+  } else if (req.path.match(/^\/api.*/)) {
+    passport.authenticate('jwt', { session: false })(req, res, next);
+  } else {
+    if (!req.isAuthenticated()) {
+      return res.redirect('/login');
+    } else {
+      next();
+    }
   }
 });
 
@@ -71,7 +75,7 @@ router.use(async(req, res, next) => {
 });
 
 // Login
-router.get('/login',(req, res) =>  {
+router.get('/login', (req, res) =>  {
   res.render('login')
 });
 
@@ -79,6 +83,43 @@ router.post(
   '/login',
   passport.authenticate('local', { failureRedirect: '/login', }),
   (req, res) => res.redirect('/')
+);
+
+router.post('/api/login', (req, res) => {
+  User.findAll({ where: { username: req.body.username }, })
+    .then(user => {
+      user = user[0];
+      if (!user) {
+        res.set('WWW-Authenticate', 'Bearer');
+        return res.status(401).send(); 
+      }
+
+      if (!bcrypt.compareSync(req.body.password, user.password)) {
+        res.set('WWW-Authenticate', 'Bearer');
+        return res.status(401).send();
+      }
+
+      if (user.tokens.length > 0) {
+        res.status(200).send(user.tokens[0]);
+      } else {
+        jwt.encode('secret', { userId: user.id }, (err, token) => {
+          user.update({ tokens: user.tokens.concat(token) })
+            .then(() => res.status(200).send(token));
+        });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(500).send(
+        JSON.stringify({ message: 'Something went wrong, try again' })
+      );
+    });
+});
+
+router.get('/api/test',
+  function (req, res) {
+    res.status(200).send('authenticated');
+  }
 );
 
 router.get('/logout', (req, res) => {
@@ -103,7 +144,7 @@ router.post('/users', async(req, res) => {
     lastName: req.body.lastname,
     username: req.body.username,
     password: hashedPassword,
-    role: reque.body.role,
+    role: req.body.role,
   }
 
   try {
