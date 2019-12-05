@@ -1,3 +1,15 @@
+{{#if errors}}
+  <article class="message is-danger">
+    <div class="message-body">
+      <ul>
+        {{#each errors}}
+          <li>{{this.message}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  </article>
+{{/if}}
+
 <!-- Terminal -->
 <div id="build-terminal" class="box terminal-wrapper" style="display: none">
   <details open="true">
@@ -30,10 +42,62 @@
             {{ app.url }}
           </a>
         </p>
-        
+
         <p>
           <strong>Health:</strong>
-          <span class="tag" id="app-health"></span>
+          <span class="tag" id="app-health">Loading...</span>
+        </p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- Deploy -->
+<div class="box">
+  <div class="content">
+    <details open="true">
+      <summary>Deploy</summary>
+      <div class="content">
+        <article class="message is-info">
+          <div class="message-body">
+            To deploy an app, attach a .zip file containing your app&rsquo;s
+            source code and click 'Deploy' &ndash; we&rsquo;ll take care of the
+            rest. Be sure that your zip file does not nest your app files
+            in an extra directory.
+          </div>
+        </article>
+      </div>
+      <div class="content">
+        <p>
+          <form method="POST" action="/apps/{{app.id}}/deploy" enctype="multipart/form-data">
+            <div class="field">
+              <div class="file-js file is-small has-name">
+                <label class="file-label">
+                  <input class="file-input" type="file" name="file">
+
+                  <span class="file-cta">
+                    <span class="file-icon">
+                      <i class="fas fa-upload"></i>
+                    </span>
+
+                    <span class="file-label">
+                      Add .zip file of application...
+                    </span>
+                  </span>
+
+                  <span class="file-name">
+                    No file uploaded
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field is-grouped">
+              <p class="control flex-float-right">
+                <button class="button is-link" type="submit">Deploy</button>
+              </p>
+            </div>
+          </form>
         </p>
       </div>
     </details>
@@ -116,9 +180,9 @@
       <form id="exec-form">
         <p>
           Run a command in your app and view the output in a console (e.g.
-          <code>rake db:migrate</code>). Interactive commands work too 
-          (e.g. <code>bash</code>). Please note that your command runs in 
-          a one-off container, so filesystem changes are not persistent. 
+          <code>rake db:migrate</code>). Interactive commands work too
+          (e.g. <code>bash</code>). Please note that your command runs in
+          a one-off container, so filesystem changes are not persistent.
         </p>
         <div class="field has-addons">
           <div class="control">
@@ -136,7 +200,7 @@
       <div id="terminal-modal" class="modal">
         <div class="modal-background"></div>
         <section class="modal-content">
-          <progress 
+          <progress
             id="terminal-loading"
             class="progress is-large is-info"
             style="display: none"
@@ -146,7 +210,7 @@
         </section>
         <button class="modal-close is-large" aria-label="close"></button>
       </div>
-      
+
     </div>
   </details>
 </div>
@@ -253,6 +317,11 @@
   (() => {
     document.addEventListener('DOMContentLoaded', function() {
       const output = document.getElementById('app-health');
+      if ('{{ app.deployed }}' === '') {
+        output.innerHTML = 'Not yet deployed';
+        return;
+      }
+
       const websocket = new WebSocket(
         `ws://${window.location.host}/app-health?appId={{app.id}}`
       );
@@ -297,7 +366,7 @@
       const command = document.querySelector('#exec-form .input').value;
       document.querySelector('#exec-form .input').value = null;
       progressBar.style.display = "block";
-      
+
       websocket = new WebSocket(
         `ws://localhost:3000/terminal?appTitle={{app.title}}&command=${command}`
       );

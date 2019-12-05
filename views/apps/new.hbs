@@ -14,18 +14,9 @@
             </ul>
           </div>
         </article>
-      {{else}}
-        <article class="message is-info">
-          <div class="message-body">
-            To create and deploy new app, attach a .zip file containing your app&rsquo;s
-            source code and click create &ndash; we&rsquo;ll take care of the
-            rest. Be sure that your zip file does not nest your app files
-            in an extra directory.
-          </div>
-        </article>
       {{/if}}
 
-      <form method="POST" action="/apps" enctype="multipart/form-data">
+      <form method="POST" action="/apps">
         <div class="field">
           <label class="label">Name</label>
 
@@ -33,26 +24,6 @@
             <input class="input" type="text" name="title" placeholder="my-new-app" />
           </div>
           <p class="help">Please only use lowercase letters, numbers, and dashes.</p>
-        </div>
-
-        <div class="field">
-          <label class="label">Application File</label>
-          <div id="file-js-example" class="file has-name">
-            <label class="file-label">
-              <input class="file-input" type="file" name="file">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-                </span>
-                <span class="file-label">
-                  Choose a file…
-                </span>
-              </span>
-              <span class="file-name">
-                No file uploaded
-              </span>
-            </label>
-          </div>
         </div>
 
         <hr/>
@@ -69,13 +40,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  const fileInput = document.querySelector('#file-js-example input[type=file]');
-  fileInput.onchange = () => {
-   if (fileInput.files.length > 0) {
-     const fileName = document.querySelector('#file-js-example .file-name');
-     fileName.textContent = fileInput.files[0].name;
-   }
-  }
-</script>
