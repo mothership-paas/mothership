@@ -6,6 +6,7 @@ const Config = require('../server/models').Config;
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 const moveApplicationFile = (req) => {
   return new Promise((resolve, reject) => {
@@ -19,6 +20,32 @@ const moveApplicationFile = (req) => {
     });
   });
 };
+
+const destroyAppWithoutDatabase = (app) => {
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyNetwork)
+      .then((app) => {
+        App.destroy({  where: { id: app.id } })
+      })
+  });
+}
+
+const destroyAppWithDatabase = (app) => {
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyDatabaseService)
+      .then(DockerWrapper.pruneDatabaseVolume)
+      .then(DockerWrapper.destroyNetwork)
+      .then((app) => {
+        const appId = app.id
+        App.destroy({  where: { id: appId } })
+          .then(() => {
+            Database.destroy({  where: { app_id: app.id } })
+          });
+      });
+  }); 
+}
 
 module.exports = {
   async create(req, res) {
@@ -143,22 +170,54 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },    
 
-  destroy(req, res) {
+  delete(req, res) { // TODO: remove queries from delete view
     return App
-      .findByPk(req.params.appId)
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
       .then(app => {
         if (!app) {
-          return res.status(400).send({
-            message: 'App Not Found',
+          return res.status(404).send({
+            message: 'App Not Found'
           });
         }
-        return app
+        
+        res.render('apps/delete', { app });
       })
-      .then(DockerWrapper.destroyService)
-      .then(DockerWrapper.destroyNetwork)
-      .then(() => res.redirect('/apps'))
-      .catch((error) => res.status(400).send(error))
+      .catch(error => res.status(400).send(error));
   },
+
+  destroy(req, res) {
+    App
+      .findByPk(req.params.appId)
+      .then(app => {
+        return new Promise((resolve, reject) => {
+          if (!app) {
+            return res.status(400).send({ 
+              message: 'App Not Found' 
+            });
+          }
+
+          rimraf(app.path, (err) => {
+            if (err) { reject(err) }
+            resolve(app);
+          });
+        });
+      })
+      .then((app) => {
+        Database
+          .findOne({ where: { "app_id": app.id } })
+          .then((database) => {
+            if (database) {
+              destroyAppWithDatabase(app);
+            } else {
+              destroyAppWithoutDatabase(app)
+            }
+          })
+        })
+      .then(() => res.redirect('/apps'))
+      .catch((error) => res.status(400).send(error));
+  },     
 
   createDatabase(req, res) {
     App.findByPk(req.params.appId)

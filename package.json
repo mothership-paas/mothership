@@ -24,6 +24,7 @@
     "nodejs-tail": "^1.1.0",
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
+    "rimraf": "^3.0.0",
     "sequelize": "^5.21.2",
     "slugify": "^1.3.6",
     "tail": "2.0.3",
