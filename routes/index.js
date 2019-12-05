@@ -43,17 +43,24 @@ router.use(function(req, res, next) {
   }
 });
 
+// Get user middleware
+router.use(async(req, res, next) => {
+  if (req.user) {
+    res.locals.userIsAdmin = req.user.role === 'admin';
+  }
+
+  next();
+});
+
 // Authorization middlware
 router.use(async(req, res, next) => {
+  console.log(req.user);
   // users routes require admin priveleges
   if (req.path.match(/^\/users.*/)) {
     try {
-      const user = await User.findByPk(req.session.passport.user);
-      if (user.role === 'admin') {
-        console.log('passed auth');
+      if (req.user && req.user.role === 'admin') {
         next(); 
       } else {
-        console.log('failed auth');
         res.redirect('/apps');
       }
     } catch(err) {
@@ -80,7 +87,6 @@ router.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/login');
 });
-
 
 // Users
 router.get('/users', async(req, res) => {
