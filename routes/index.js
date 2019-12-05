@@ -5,6 +5,8 @@ const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
 const stream = require('stream');
+const util = require('util');
+const WebSocket = require('ws');
 
 const eventLogger = require('../lib/EventLogger');
 const spawn = require('child_process').spawn;
@@ -38,12 +40,15 @@ router.get('/events/:appId/exec', eventLogger.appExecEvents);
 router.get('/apps', appsController.list);
 router.get('/apps/new', appsController.new);
 router.get('/apps/:appId', appsController.show);
+router.get('/apps/:appId/edit', appsController.showUpdatePage);
 router.post('/apps', upload.single('file'), appsController.create);
-router.delete('/apps/:appId', appsController.destroy);
+router.post('/apps/:appId/edit', upload.single('file'), appsController.update);
 
 // Database
 router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
 
+// Env Variables
+router.post('/apps/:appId/env', appsController.updateEnvVar);
 // Scale/Replicas
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
@@ -70,7 +75,7 @@ router.post('/apps/:appId/exec', (req, res) => {
         });
       });
 
-      const runOptions =  { 
+      const runOptions =  {
         Env: [
           // TODO: These shouldn't be hard-coded... store in db?
           `DATABASE_HOST=${app.title}_database`,

@@ -13,8 +13,11 @@
     "dockerode": "^3.0.2",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
+    "express-handlebars": "^3.1.0",
+    "express-ws": "^4.0.0",
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
+    "momentjs": "^2.0.0",
     "morgan": "~1.9.1",
     "multer": "^1.4.2",
     "node-sass-middleware": "0.11.0",
@@ -26,7 +29,9 @@
     "tail": "2.0.3",
     "tail-file": "1.4.13",
     "tar-fs": "^2.0.0",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "ws": "^7.2.0",
+    "xterm": "^4.2.0-vscode1"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"

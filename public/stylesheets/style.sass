@@ -81,4 +81,50 @@ details[open] summary
   border-color: #66bb6a
   box-shadow: 0 0 0 1px #66bb6a
   color: #1a651d
-        
+
+.build-terminal-failed
+  background: #feecf0
+  border-color: #f14668
+  box-shadow: 0 0 0 1px #f14668
+
+.form-list-action-container
+  height: 2.5em
+  display: flex
+  align-items: center
+  justify-content: center
+
+// Utility
+.flex-float-right
+  margin-left: auto
+
+// Hack to make xterm right height
+.terminal.xterm
+  height: 408px
+
+// Hack to make modals as wide as xterm
+.modal-content
+  width: 720px
+
+// Mobile
+@media only screen and (max-width: 600px)
+  body
+    display: block
+
+  nav.main-nav
+    display: flex
+    border-bottom: 1px solid #ddd
+
+  nav.main-nav .logo
+    padding: 16px
+    border-right: 1px solid #ddd
+
+  nav.main-nav .logo svg
+    width: 32px !important
+
+  nav.main-nav ul
+    display: flex
+    flex: 1
+    overflow-x: auto
+
+  .main-section
+    margin: 0

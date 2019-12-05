@@ -89,6 +89,37 @@ module.exports = {
       .catch(error => { console.log(error); });
   },
 
+  async update(req, res) {
+    if (!req.file || req.file.mimetype !== 'application/zip') {
+      return res.render('apps/update', 
+        { errors: [
+          { message: 'Please attach a .zip file of your application.' }
+          ],
+          app: app,
+       });
+    }
+
+    await moveApplicationFile(req);
+
+    App
+      .findByPk(req.params.appId)
+      .then((app) => app.update({ filename: req.file.filename + '.zip' }))
+      .then((app) => {
+        return new Promise(async(resolve, reject) => {
+          app.emitEvent(`Updating application '${app.title}'`);
+          res.redirect(`/apps/${app.id}?events`);
+          resolve(app);
+        });
+      })
+      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildImage)
+      .then(DockerWrapper.updateService())
+      .then((app) => {
+        app.emitEvent('===END===');
+      })
+      .catch(error => { console.log(error); });
+  },
+
   list(req, res) {
     return App.findAll()
       .then(apps => {
@@ -115,8 +146,28 @@ module.exports = {
 
         res.render('apps/show', { app });
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => {
+        console.log(error);
+        res.status(400).send(error);
+      });
   },
+
+  showUpdatePage(req, res) {
+    return App
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
+      .then(app => {
+        if (!app) {
+          return res.status(404).send({
+            message: 'App Not Found'
+          });
+        }
+
+        res.render('apps/update', { app });
+      })
+      .catch(error => res.status(400).send(error));
+  },    
 
   destroy(req, res) {
     return App
@@ -128,11 +179,11 @@ module.exports = {
           });
         }
         return app
-          .destroy()
-          .then(() => res.redirect('/apps'))
-          .catch((error) => res.status(400).send(error))
       })
-      .catch(error => res.status(400).send(error));
+      .then(DockerWrapper.destroyService)
+      .then(DockerWrapper.destroyNetwork)
+      .then(() => res.redirect('/apps'))
+      .catch((error) => res.status(400).send(error))
   },
 
   createDatabase(req, res) {
@@ -194,5 +245,22 @@ module.exports = {
       })
       .then(DockerWrapper.updateService(serviceConfig))
       .catch(error => console.log(error));
+  },
+
+  updateEnvVar(req, res) {
+    // TODO: may be worth refactoring this later to be less brittle if request formatting is bad
+    // just return an error to client if request body was formatted incorrectly
+    const submittedEnvVars = Object.keys(req.body).map(key => req.body[key]);
+    const validEnvVars = submittedEnvVars.filter(env => env.key.trim().length && env.val.trim().length);
+    const formattedEnvVars = validEnvVars.map(env => `${env.key.trim()}=${env.val.trim()}`)
+
+    App.findByPk(req.params.appId)
+      .then(app => app.update({ envVariables: formattedEnvVars }))
+      .then(DockerWrapper.updateService())
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`);
+        return app;
+      })
+      .catch(error => console.log(error))
   },
 };
