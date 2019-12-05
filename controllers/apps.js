@@ -114,7 +114,6 @@ module.exports = {
       .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
       .then(DockerWrapper.buildImage)
       .then(DockerWrapper.updateService())
-      .then(checkForDatabase)
       .then((app) => {
         app.emitEvent('===END===');
       })
