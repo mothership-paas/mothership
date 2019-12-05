@@ -6,6 +6,7 @@ const Config = require('../server/models').Config;
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 const moveApplicationFile = (req) => {
   return new Promise((resolve, reject) => {
@@ -190,12 +191,16 @@ module.exports = {
     App
       .findByPk(req.params.appId)
       .then(app => {
-        if (!app) {
-          return res.status(400).send({
-            message: 'App Not Found',
+        return new Promise((resolve, reject) => {
+          if (!app) {
+            return res.status(400).send({ message: 'App Not Found' });
+          }
+
+          rimraf(app.path, (err) => {
+            if (err) { reject(err) }
+            resolve(app);
           });
-        }
-        return app;
+        });
       })
       .then((app) => {
         Database
