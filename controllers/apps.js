@@ -20,18 +20,32 @@ const moveApplicationFile = (req) => {
   });
 };
 
-const checkForDatabase = (req) => { // TODO: Should this be a promise?
-  return new Promise((resolve, reject) => {
-    Database
-    .findOne({ where: { "app_id": app.id }})
-    .then((database) => {
-      if (database) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });  
-  });
+const destroyAppWithoutDatabase = (app) => {
+  // return new Promise((resolve, reject) => {
+  //   Database
+  //   .findOne({ where: { "app_id": app.id }})
+  //   .then((database) => {
+  //     if (database) {
+  //       resolve(true);
+  //     } else {
+  //       resolve(false);
+  //     }
+  //   });  
+  // });
+}
+
+const destroyAppWithDatabase = (app) => {
+  // return new Promise((resolve, reject) => {
+  //   Database
+  //   .findOne({ where: { "app_id": app.id }})
+  //   .then((database) => {
+  //     if (database) {
+  //       resolve(true);
+  //     } else {
+  //       resolve(false);
+  //     }
+  //   });  
+  // });
 }
 
 module.exports = {
@@ -186,29 +200,44 @@ module.exports = {
         }
         return app;
       })
-      // .then(DockerWrapper.destroyService)
-      // .then(DockerWrapper.destroyNetwork)
       .then((app) => {
-        Database
-          .findOne({ where: { "app_id": app.id }})
-          .then((database) => {
-            if (database) {
-              console.log('database exists');
-              // DockerWrapper.destroyDatabase(app) // service name_database
-                // .then(DockerWrapper.destroyDatabaseVolume) // volume name + _db_data
-                // .then(removeDatabaseInfoFromDatabase) // sequelize call
-                // .then(app => resolve(app));
-                return app;
-            } else {
-              console.log('database no exist');
-              return app;
-            }
-          })
-      })
-      // .then(removeAppFromDatabase)
+          Database
+            .findOne({ where: { "app_id": app.id } })
+            .then((database) => {
+                if (database) {
+                  destroyAppWithDatabase(app);
+                } else {
+                  destroyAppWithoutDatabase(app)
+                }
+              }
+        })
       .then(() => res.redirect('/apps'))
-      .catch((error) => res.status(400).send(error))
+      .catch((error) => res.status(400).send(error));
   },
+
+
+      //         DockerWrapper.destroyDatabaseService(app) // service name_database
+      //           .then(DockerWrapper.destroyDatabaseVolume) // volume name + _db_data
+      //           .then(DockerWrapper.destroyNetwork)
+      //           .then(DockerWrapper.destroyService)
+      //           .then(app => {
+      //             return new Promise((resolve, reject) => {
+      //               resolve(app);
+      //             });
+      //           });
+      //         // .then(removeDatabaseInfoFromDatabase) // sequelize call
+      //       } else {
+      //         DockerWrapper.destroyNetwork(app)
+      //         .then(app => {
+      //             return new Promise((resolve, reject) => {
+      //               resolve(app);
+      //             });
+      //          });
+      //       }
+      //     });
+      // })
+      // // .then(removeAppFromDatabase)
+      
 
   createDatabase(req, res) {
     App.findByPk(req.params.appId)
