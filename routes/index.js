@@ -102,6 +102,7 @@ router.post('/users', async(req, res) => {
     lastName: req.body.lastname,
     username: req.body.username,
     password: hashedPassword,
+    role: reque.body.role,
   }
 
   try {
@@ -119,13 +120,13 @@ router.post('/users', async(req, res) => {
     res.redirect('/users');
   } catch(err) {
     delete userProps.password;
-    res.render('users/create', { user: userProps, errors: err.errors });
+    res.render('users/create', { user: userProps, isAdmin: user.role === 'admin', errors: err.errors });
   }
 });
 
 router.get('/users/:userId/edit', async(req, res) => {
   const user = await User.findByPk(req.params.userId);
-  res.render('users/edit', { user });
+  res.render('users/edit', { user, isAdmin: user.role === 'admin' });
 });
 
 router.post('/users/:userId', async(req, res) => {
@@ -134,6 +135,7 @@ router.post('/users/:userId', async(req, res) => {
     firstName: req.body.firstname,
     lastName: req.body.lastname,
     username: req.body.username,
+    role: req.body.role,
   };
 
   try {

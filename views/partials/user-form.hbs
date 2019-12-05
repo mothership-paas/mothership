@@ -27,6 +27,21 @@
   <input type="password" name="password"/>
 </div>
 <div>
+  <input type="radio" id="admin" name="role" value="admin"
+    {{#if isAdmin}}
+    checked
+    {{/if}}
+  >
+  <label for="admin">Admin User</label>
+
+  <input type="radio" id="regular" name="role" value="user"
+    {{#unless isAdmin}}
+    checked
+    {{/unless}}
+  >
+  <label for="regular">Regular User</label>
+</div>
+<div>
   <button type="submit">{{submitText}}</button>
   <a href="/users">Cancel</a>
 </div>
