@@ -193,7 +193,9 @@ module.exports = {
       .then(app => {
         return new Promise((resolve, reject) => {
           if (!app) {
-            return res.status(400).send({ message: 'App Not Found' });
+            return res.status(400).send({ 
+              message: 'App Not Found' 
+            });
           }
 
           rimraf(app.path, (err) => {
