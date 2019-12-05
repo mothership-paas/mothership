@@ -21,31 +21,25 @@ const moveApplicationFile = (req) => {
 };
 
 const destroyAppWithoutDatabase = (app) => {
-  // return new Promise((resolve, reject) => {
-  //   Database
-  //   .findOne({ where: { "app_id": app.id }})
-  //   .then((database) => {
-  //     if (database) {
-  //       resolve(true);
-  //     } else {
-  //       resolve(false);
-  //     }
-  //   });  
-  // });
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyNetwork)
+      .then(() => {
+        resolve(app);
+      });
+  });
 }
 
 const destroyAppWithDatabase = (app) => {
-  // return new Promise((resolve, reject) => {
-  //   Database
-  //   .findOne({ where: { "app_id": app.id }})
-  //   .then((database) => {
-  //     if (database) {
-  //       resolve(true);
-  //     } else {
-  //       resolve(false);
-  //     }
-  //   });  
-  // });
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyDatabaseService)
+      .then(DockerWrapper.pruneDatabaseVolume)
+      .then(DockerWrapper.destroyNetwork)
+      .then(() => {
+        resolve(app);
+      });
+  }); 
 }
 
 module.exports = {
@@ -201,15 +195,15 @@ module.exports = {
         return app;
       })
       .then((app) => {
-          Database
-            .findOne({ where: { "app_id": app.id } })
-            .then((database) => {
-                if (database) {
-                  destroyAppWithDatabase(app);
-                } else {
-                  destroyAppWithoutDatabase(app)
-                }
-              }
+        Database
+          .findOne({ where: { "app_id": app.id } })
+          .then((database) => {
+            if (database) {
+              destroyAppWithDatabase(app);
+            } else {
+              destroyAppWithoutDatabase(app)
+            }
+          })
         })
       .then(() => res.redirect('/apps'))
       .catch((error) => res.status(400).send(error));
