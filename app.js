@@ -10,6 +10,7 @@ const session = require('express-session');
 const bcrypt = require('bcrypt');
 const Strategy = require('passport-local').Strategy;
 const User = require('./server/models').User;
+const jwt = require('json-web-token');
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -22,7 +23,32 @@ var indexRouter = require('./routes/index');
 
 var app = express();
 
-// passport seetup
+// passport setup
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
+const jwtOpts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: 'secret',
+  passReqToCallback: true,
+}
+
+passport.use(new JwtStrategy(jwtOpts, function(req, jwt_payload, done) {
+  const authHeader = req.header('Authorization');
+  const rawToken = authHeader ? authHeader.split(' ')[1] : '';
+
+  User.findByPk(jwt_payload.userId)
+    .then(user => {
+      console.log(req.body)
+      if (user && user.tokens.includes(rawToken)) {
+        return done(null, user);
+      } else {
+        done(null, false);
+      }
+    })
+    .catch(err => done(err, false));
+}));
+
 passport.use(
   new Strategy(function(username, password, cb) {
     User.findAll({ where: { username: username }, })
