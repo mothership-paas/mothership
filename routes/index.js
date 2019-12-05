@@ -38,7 +38,6 @@ router.use(function(req, res, next) {
   } else if (req.path !== '/login' && !req.isAuthenticated()) {
     res.redirect('/login');
   } else {
-    console.log('passed authentication');
     next();
   }
 });
@@ -54,7 +53,6 @@ router.use(async(req, res, next) => {
 
 // Authorization middlware
 router.use(async(req, res, next) => {
-  console.log(req.user);
   // users routes require admin priveleges
   if (req.path.match(/^\/users.*/)) {
     try {
@@ -90,11 +88,8 @@ router.get('/logout', (req, res) => {
 
 // Users
 router.get('/users', async(req, res) => {
-  console.log('made it to users controller');
   const users = await User.findAll();
-  console.log('found user');
   res.render('users/index', { users });
-  console.log('sent render');
 });
 
 router.get('/users/new', (req, res) => {
@@ -214,7 +209,6 @@ router.post('/apps/:appId/exec', (req, res) => {
       tail.stdout.on('data', data => {
         fs.readFile(fileName, (err, fileContents) => {
           if (err) throw err;
-          console.log('read from file');
           app.emitEvent(fileContents.toString('utf8'), 'exec')
         });
       });
