@@ -1,0 +1,47 @@
+<div class="columns">
+  <div class="column is-half">
+
+    <div class="box">
+      <h1 class="subtitle">Delete App</h1>
+
+      {{#if errors}}
+        <article class="message is-danger">
+          <div class="message-body">
+            <ul>
+              {{#each errors}}
+                <li>{{this.message}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        </article>
+      {{else}}
+        <article class="message is-danger">
+          <div class="message-body">
+            Are you sure you want to delete this app?<br/>
+            This action is non-reversible!
+          </div>
+        </article>
+      {{/if}}
+
+      <form method="POST" action="/apps/{{app.id}}/delete" enctype="multipart/form-data">
+
+        <div class="field" hidden>
+          <label class="label">Name</label>
+
+          <div class="control">
+            <input class="input" type="text" name="title" value="{{ app.title }}" placeholder="my-new-app" />
+          </div>
+        </div>
+
+        <div class="field is-grouped">
+          <p class="control">
+            <button type="submit" class="button is-danger">Delete</button>
+          </p>
+          <p class="control">
+            <a class="button" href="/apps">Cancel</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
