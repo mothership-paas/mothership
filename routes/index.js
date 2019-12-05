@@ -34,8 +34,32 @@ const upload = multer({storage});
 router.use(function(req, res, next) {
   if (req.path.match(/^\/api.*/) && !req.isAuthenticated()) {
     res.status(403).send();
+    res.end()
   } else if (req.path !== '/login' && !req.isAuthenticated()) {
     res.redirect('/login');
+  } else {
+    console.log('passed authentication');
+    next();
+  }
+});
+
+// Authorization middlware
+router.use(async(req, res, next) => {
+  // users routes require admin priveleges
+  if (req.path.match(/^\/users.*/)) {
+    try {
+      const user = await User.findByPk(req.session.passport.user);
+      if (user.isAdmin) {
+        console.log('passed auth');
+        next(); 
+      } else {
+        console.log('failed auth');
+        res.redirect('/apps');
+      }
+    } catch(err) {
+      res.redirect('/apps');
+      res.end();
+    }
   } else {
     next();
   }
@@ -60,8 +84,11 @@ router.get('/logout', (req, res) => {
 
 // Users
 router.get('/users', async(req, res) => {
+  console.log('made it to users controller');
   const users = await User.findAll();
+  console.log('found user');
   res.render('users/index', { users });
+  console.log('sent render');
 });
 
 router.get('/users/new', (req, res) => {
