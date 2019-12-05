@@ -49,7 +49,7 @@ router.use(async(req, res, next) => {
   if (req.path.match(/^\/users.*/)) {
     try {
       const user = await User.findByPk(req.session.passport.user);
-      if (user.isAdmin) {
+      if (user.role === 'admin') {
         console.log('passed auth');
         next(); 
       } else {
