@@ -1,4 +1,6 @@
 const passport = require('passport');
+const multer  = require('multer');
+const uuid = require('uuid/v1');
 
 module.exports = {
   authentication(req, res, next) {
@@ -40,4 +42,17 @@ module.exports = {
 
     next();
   },
-}
+
+  upload(req, res, next) {
+    const storage = multer.diskStorage({
+      // TODO: validate that the file is a zip
+      destination: (req, file, cb) => {
+        const directoryName = `./tmp/`;
+        cb(null, directoryName);
+      },
+      filename: (req, file, cb) => cb(null, uuid())
+    });
+
+    return multer({ storage });
+  }
+};
