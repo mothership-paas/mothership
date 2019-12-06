@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const appsController = require('../controllers/apps');
 const usersController = require('../controllers/users');
+const sessAuthController = require('../controllers/sessAuth');
+const apiAuthController =  require('../controllers/apiAuth');
 const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
@@ -75,63 +77,17 @@ router.use(async(req, res, next) => {
   }
 });
 
-// Login
-router.get('/login', (req, res) =>  {
-  res.render('login')
-});
-
-router.post(
-  '/login',
-  passport.authenticate('local', { failureRedirect: '/login', }),
-  (req, res) => res.redirect('/')
-);
-
-router.post('/api/login', (req, res) => {
-  User.findAll({ where: { username: req.body.username }, })
-    .then(user => {
-      user = user[0];
-      if (!user) {
-        res.set('WWW-Authenticate', 'Bearer');
-        return res.status(401).send(); 
-      }
-
-      if (!bcrypt.compareSync(req.body.password, user.password)) {
-        res.set('WWW-Authenticate', 'Bearer');
-        return res.status(401).send();
-      }
-
-      if (user.tokens.length > 0) {
-        res.status(200).send(user.tokens[0]);
-      } else {
-        jwt.encode('secret', { userId: user.id }, (err, token) => {
-          user.update({ tokens: user.tokens.concat(token) })
-            .then(() => res.status(200).send(token));
-        });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      return res.status(500).send(
-        JSON.stringify({ message: 'Something went wrong, try again' })
-      );
-    });
-});
-
-router.get('/api/test',
-  function (req, res) {
-    res.status(200).send('authenticated');
-  }
-);
-
-router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/login');
-});
-
 // Homepage
 router.get('/', function(req, res, next) {
   res.redirect('/apps');
 });
+
+// Authentication
+const authenticator = passport.authenticate('local', { failureRedirect: '/login' });
+router.get('/login', sessAuthController.loginForm);
+router.get('/logout', sessAuthController.logout);
+router.post('/login', authenticator, sessAuthController.login);
+router.post('/api/login', apiAuthController.login);
 
 // Event Streaming
 router.get('/events/:appId', eventLogger.appEvents);
