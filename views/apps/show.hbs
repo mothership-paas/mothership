@@ -71,7 +71,7 @@
         <p>
           <form method="POST" action="/apps/{{app.id}}/deploy" enctype="multipart/form-data">
             <div class="field">
-              <div class="file-js file is-small has-name">
+              <div id="file-js-zip" class="file is-small has-name">
                 <label class="file-label">
                   <input class="file-input" type="file" name="file">
 
@@ -139,7 +139,7 @@
 
         <form method="POST" action="/apps/{{app.id}}/database" enctype="multipart/form-data">
           <div class="field">
-            <div id="file-js-example" class="file is-small has-name">
+            <div id="file-js-sql" class="file is-small has-name">
               <label class="file-label">
                 <input class="file-input" type="file" name="file">
 
