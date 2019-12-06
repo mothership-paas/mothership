@@ -5,23 +5,8 @@ const appsController = require('../controllers/apps');
 const usersController = require('../controllers/users');
 const sessAuthController = require('../controllers/sessAuth');
 const apiAuthController =  require('../controllers/apiAuth');
-const multer  = require('multer');
-const fs = require('fs');
-const uuid = require('uuid/v1');
-const stream = require('stream');
-const util = require('util');
-const WebSocket = require('ws');
 const passport = require('passport');
-const bcrypt = require('bcrypt');
-const jwt = require('json-web-token');
-
 const eventLogger = require('../lib/EventLogger');
-const spawn = require('child_process').spawn;
-
-const DockerWrapper = require('../lib/DockerWrapper');
-const App = require('../server/models').App;
-const User = require('../server/models').User;
-
 
 // Router middleware
 router.use(middlewares.authentication);
