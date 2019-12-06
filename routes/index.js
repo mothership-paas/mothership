@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const middlewares = require('./middlewares');
 const appsController = require('../controllers/apps');
 const usersController = require('../controllers/users');
 const sessAuthController = require('../controllers/sessAuth');
@@ -34,48 +35,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage});
 
-// Authentication middleware
-router.use(function(req, res, next) {
-  if (req.path === '/api/login' || req.path === '/login') {
-    next();
-  } else if (req.path.match(/^\/api.*/)) {
-    passport.authenticate('jwt', { session: false })(req, res, next);
-  } else {
-    if (!req.isAuthenticated()) {
-      return res.redirect('/login');
-    } else {
-      next();
-    }
-  }
-});
-
-// Get user middleware
-router.use(async(req, res, next) => {
-  if (req.user) {
-    res.locals.userIsAdmin = req.user.role === 'admin';
-  }
-
-  next();
-});
-
-// Authorization middlware
-router.use(async(req, res, next) => {
-  // users routes require admin priveleges
-  if (req.path.match(/^\/users.*/)) {
-    try {
-      if (req.user && req.user.role === 'admin') {
-        next(); 
-      } else {
-        res.redirect('/apps');
-      }
-    } catch(err) {
-      res.redirect('/apps');
-      res.end();
-    }
-  } else {
-    next();
-  }
-});
+// Router middleware
+router.use(middlewares.authentication);
+router.use(middlewares.authorization);
+router.use(middlewares.isAdmin);
 
 // Homepage
 router.get('/', function(req, res, next) {
