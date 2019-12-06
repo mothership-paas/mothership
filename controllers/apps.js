@@ -6,12 +6,13 @@ const Config = require('../server/models').Config;
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
-const moveApplicationFile = (req) => {
+const moveApplicationFile = (req, app) => {
   return new Promise((resolve, reject) => {
-    const destination = `uploads/${req.body.title}/${req.file.filename}.zip`;
+    const destination = `uploads/${app.title}/${req.file.filename}.zip`;
 
-    fs.mkdir(`uploads/${req.body.title}`, (err) => {
+    fs.mkdir(`uploads/${app.title}`, (err) => {
       fs.rename(req.file.path, destination, (err) => {
         if (err) { reject(err) }
         resolve(req);
@@ -20,74 +21,107 @@ const moveApplicationFile = (req) => {
   });
 };
 
+const destroyAppWithoutDatabase = (app) => {
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyNetwork)
+      .then((app) => {
+        App.destroy({  where: { id: app.id } })
+      })
+  });
+}
+
+const destroyAppWithDatabase = (app) => {
+  return new Promise((resolve, reject) => {
+    DockerWrapper.destroyService(app)
+      .then(DockerWrapper.destroyDatabaseService)
+      .then(DockerWrapper.pruneDatabaseVolume)
+      .then(DockerWrapper.destroyNetwork)
+      .then((app) => {
+        const appId = app.id
+        App.destroy({  where: { id: appId } })
+          .then(() => {
+            Database.destroy({  where: { app_id: app.id } })
+          });
+      });
+  });
+}
+
 module.exports = {
   async create(req, res) {
-    if (!req.file || req.file.mimetype !== 'application/zip') {
-      return res.render('apps/new', { errors: [{ message: 'Please attach a .zip file of your application.' }] })
-    }
+    const domain = await Config.findOne({
+      where: { key: 'domain' },
+    });
 
-    // TODO: Make path relative to app root directory
     const app = {
       title: req.body.title,
-      path: `uploads/${req.body.title}`,
-      filename: req.file.filename + '.zip',
-      network: `${req.body.title}_default`
+      url: `${req.body.title}.${domain.value}`
     };
-
-    await moveApplicationFile(req);
 
     App.create(app)
       .then((app) => {
-        // Set app subdomain now that we have id
-        return new Promise(async(resolve, reject) => {
-          const domain = await Config.findOne({
-            where: { key: 'domain' },
-          })
-          await app.update({ url: `${app.title}.${domain.value}` });
-          app.emitEvent(`Creating application '${app.title}'`)
-          res.redirect(`apps/${app.id}?events`);
-          resolve(app);
-        });
+        if (req.accepts('html')) {
+          res.redirect(`/apps/${app.id}`);
+        } else {
+          res.status(201).json({ app });
+        }
       })
       .catch(error => {
-        res.render('apps/new', { errors: error.errors });
+        if (req.accepts('html')) {
+          res.render('apps/new', { errors: error.errors });
+        } else {
+          res.status(400).json({ errors: error.errors });
+        }
         throw error;
       })
-      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
-      .then(DockerWrapper.buildImage)
-      .then(DockerWrapper.createNetwork)
-      .then(DockerWrapper.createService)
-      .then((app) => {
-        app.emitEvent('===END===');
-      })
-      .catch(error => { console.log(error); });
   },
 
-  async update(req, res) {
+  async deploy(req, res) {
+    const app = await App.findByPk(req.params.appId);
+
     if (!req.file || req.file.mimetype !== 'application/zip') {
-      return res.render('apps/update', 
-        { errors: [
-          { message: 'Please attach a .zip file of your application.' }
-          ],
-          app: app,
-       });
+      return res.render(`apps/show`, {
+        app: app,
+        errors: [{ message: 'Please attach a .zip file when deploying' }]
+      });
     }
 
-    await moveApplicationFile(req);
+    await moveApplicationFile(req, app);
 
-    App
-      .findByPk(req.params.appId)
-      .then((app) => app.update({ filename: req.file.filename + '.zip' }))
-      .then((app) => {
+    const updateParams = {
+      path: `uploads/${app.title}`,
+      filename: req.file.filename + '.zip',
+      network: `${app.title}_default`,
+    };
+
+    app.update(updateParams)
+      .then(app => {
         return new Promise(async(resolve, reject) => {
-          app.emitEvent(`Updating application '${app.title}'`);
-          res.redirect(`/apps/${app.id}?events`);
+          if (req.accepts('html')) {
+            res.redirect(`/apps/${app.id}?events`);
+          } else {
+            res.status(201).json({ stream: `/events/${app.id}` });
+          }
+          app.emitEvent(`Deploying application '${app.title}'...`);
           resolve(app);
         });
       })
-      .then(DockerWrapper.buildDockerfile(req.file.filename + '.zip'))
+      .then(DockerWrapper.buildDockerfile(app.filename))
       .then(DockerWrapper.buildImage)
-      .then(DockerWrapper.updateService())
+      .then((app) => {
+        return new Promise(async(resolve, reject) => {
+          if (app.deployed) {
+            DockerWrapper.updateService()(app)
+              .then((app) => resolve(app));
+          } else {
+            DockerWrapper.createNetwork(app)
+              .then(DockerWrapper.createService)
+              .then((app) => resolve(app))
+              .catch((err) => reject(err));
+          }
+        })
+      })
+      .then((app) => app.update({ deployed: Date.now() }))
       .then((app) => {
         app.emitEvent('===END===');
       })
@@ -97,9 +131,18 @@ module.exports = {
   list(req, res) {
     return App.findAll()
       .then(apps => {
-        res.render('apps/index', { apps: apps });
-      })
-      .catch(error => res.status(400).send(error));
+        if (req.accepts('html')) {
+          res.render('apps/index', { apps: apps });
+        } else {
+          res.json({ apps });
+        }
+      }).catch(error => {
+        if (req.accepts('html')) {
+          res.status(400).send(error);
+        } else {
+          res.status(400).json({ error });
+        }
+      });
   },
 
   new(req, res) {
@@ -141,23 +184,55 @@ module.exports = {
         res.render('apps/update', { app });
       })
       .catch(error => res.status(400).send(error));
-  },    
+  },
 
-  destroy(req, res) {
+  delete(req, res) { // TODO: remove queries from delete view
     return App
-      .findByPk(req.params.appId)
+      .findByPk(req.params.appId, {
+        include: [{model: Database, as: 'database'}]
+      })
       .then(app => {
         if (!app) {
-          return res.status(400).send({
-            message: 'App Not Found',
+          return res.status(404).send({
+            message: 'App Not Found'
           });
         }
-        return app
+
+        res.render('apps/delete', { app });
       })
-      .then(DockerWrapper.destroyService)
-      .then(DockerWrapper.destroyNetwork)
+      .catch(error => res.status(400).send(error));
+  },
+
+  destroy(req, res) {
+    App
+      .findByPk(req.params.appId)
+      .then(app => {
+        return new Promise((resolve, reject) => {
+          if (!app) {
+            return res.status(400).send({
+              message: 'App Not Found'
+            });
+          }
+
+          rimraf(app.path, (err) => {
+            if (err) { reject(err) }
+            resolve(app);
+          });
+        });
+      })
+      .then((app) => {
+        Database
+          .findOne({ where: { "app_id": app.id } })
+          .then((database) => {
+            if (database) {
+              destroyAppWithDatabase(app);
+            } else {
+              destroyAppWithoutDatabase(app)
+            }
+          })
+        })
       .then(() => res.redirect('/apps'))
-      .catch((error) => res.status(400).send(error))
+      .catch((error) => res.status(400).send(error));
   },
 
   createDatabase(req, res) {
@@ -192,14 +267,16 @@ module.exports = {
           });
         });
       })
+      .then((app) => {
+        res.redirect(`/apps/${req.params.appId}`)
+        return app;
+      })
       .then(DockerWrapper.createDatabase)
       .then(DockerWrapper.setDatabaseEnvVariablesForApp)
       .catch(error => {
         console.log(error);
         res.status(400).send(error);
       });
-
-    res.redirect('/apps');
   },
 
   updateReplicas(req, res) {
