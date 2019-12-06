@@ -406,16 +406,29 @@
 
   // Handling build output
   (() => {
-    // Update schema file upload field to reflect name of uploaded file
-    const fileInput = document.querySelector('#file-js-example input[type=file]');
-    if (fileInput) {
-      fileInput.onchange = () => {
-        if (fileInput.files.length > 0) {
-          const fileName = document.querySelector('#file-js-example .file-name');
-          fileName.textContent = fileInput.files[0].name;
+
+   // Update zip file upload field to reflect name of uploaded file
+    const fileInputZip = document.querySelector('#file-js-zip input[type=file]');
+    if (fileInputZip) {
+      fileInputZip.onchange = () => {
+        if (fileInputZip.files.length > 0) {
+          const fileNameZip = document.querySelector('#file-js-zip .file-name');
+          fileNameZip.textContent = fileInputZip.files[0].name;
         }
       }
     }
+
+    // Update schema file upload field to reflect name of uploaded file
+    const fileInputSQL = document.querySelector('#file-js-sql input[type=file]');
+    if (fileInputSQL) {
+      fileInputSQL.onchange = () => {
+        if (fileInputSQL.files.length > 0) {
+          const fileNameSQL = document.querySelector('#file-js-sql .file-name');
+          fileNameSQL.textContent = fileInputSQL.files[0].name;
+        }
+      }
+    }
+
     // Build terminal
     const terminalWrapper = document.getElementById('build-terminal');
     const terminal = document.querySelector('#build-terminal .terminal');
