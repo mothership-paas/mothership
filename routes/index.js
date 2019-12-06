@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const appsController = require('../controllers/apps');
+const usersController = require('../controllers/users');
 const multer  = require('multer');
 const fs = require('fs');
 const uuid = require('uuid/v1');
@@ -127,85 +128,7 @@ router.get('/logout', (req, res) => {
   res.redirect('/login');
 });
 
-// Users
-router.get('/users', async(req, res) => {
-  const users = await User.findAll();
-  res.render('users/index', { users });
-});
 
-router.get('/users/new', (req, res) => {
-  res.render('users/create');
-});
-
-router.post('/users', async(req, res) => {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  const userProps = {
-    firstName: req.body.firstname,
-    lastName: req.body.lastname,
-    username: req.body.username,
-    password: hashedPassword,
-    role: req.body.role,
-  }
-
-  try {
-    // Password validation: we can't do this in the model because
-    // it's hashed before the model tries to write ito the db
-    if (!req.body.password || req.body.password.length < 5) {
-      errObject = {
-        errors: [{ message: "Password must be at least 5 characters" }],
-      };
-      throw errObject;
-    }
-
-    await User.create(userProps);
-
-    res.redirect('/users');
-  } catch(err) {
-    delete userProps.password;
-    res.render('users/create', { user: userProps, isAdmin: user.role === 'admin', errors: err.errors });
-  }
-});
-
-router.get('/users/:userId/edit', async(req, res) => {
-  const user = await User.findByPk(req.params.userId);
-  res.render('users/edit', { user, isAdmin: user.role === 'admin' });
-});
-
-router.post('/users/:userId', async(req, res) => {
-  const user = await User.findByPk(req.params.userId);
-  const newProps = {
-    firstName: req.body.firstname,
-    lastName: req.body.lastname,
-    username: req.body.username,
-    role: req.body.role,
-  };
-
-  try {
-    if (req.body.password && req.body.password.length < 5) {
-      errObject = {
-        errors: [{ message: "Password must be at least 5 characters" }],
-      };
-      throw errObject;
-    }
-
-    // Only set password if they supplied a new one
-    if (req.body.password !== '') {
-      newProps.password = await bcrypt.hash(req.body.password, 10);
-    }
-
-    await user.update(newProps);
-    return res.redirect('/users');
-  } catch(err) {
-    res.render('users/create', { user: newProps, errors: err.errors });
-  }
-});
-
-router.post('/users/:userId/delete', async(req, res) => {
-  const user = await User.findByPk(req.params.userId);
-  await user.destroy();
-
-  return res.redirect('/users');
-});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -215,6 +138,14 @@ router.get('/', function(req, res, next) {
 // Event Streaming
 router.get('/events/:appId', eventLogger.appEvents);
 router.get('/events/:appId/exec', eventLogger.appExecEvents);
+
+// User
+router.get('/users', usersController.list);
+router.get('/users/new', usersController.new);
+router.get('/users/:userId/edit', usersController.edit);
+router.post('/users', usersController.create);
+router.post('/users/:userId/delete', usersController.delete);
+router.post('/users/:userId', usersController.update);
 
 // App
 router.get('/apps', appsController.list);
