@@ -38,11 +38,7 @@ const destroyAppWithDatabase = (app) => {
       .then(DockerWrapper.pruneDatabaseVolume)
       .then(DockerWrapper.destroyNetwork)
       .then((app) => {
-        const appId = app.id
-        App.destroy({  where: { id: appId } })
-          .then(() => {
-            Database.destroy({  where: { app_id: app.id } })
-          });
+        App.destroy({  where: { id: app.id } });
       });
   });
 }
