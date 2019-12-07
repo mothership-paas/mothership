@@ -48,6 +48,14 @@
               <span>Settings</span>
             </a>
           </li>
+          <li >
+            {{#if userIsAdmin}}
+              <a href="/users">
+                <i class="fas fa-users"></i>&nbsp;
+                Users
+              </a>
+            {{/if}}
+          </li>
         </ul>
 
     </nav>

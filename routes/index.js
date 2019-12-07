@@ -1,40 +1,40 @@
 const express = require('express');
 const router = express.Router();
+const middlewares = require('./middlewares');
 const appsController = require('../controllers/apps');
-const multer  = require('multer');
-const fs = require('fs');
-const uuid = require('uuid/v1');
-const stream = require('stream');
-const util = require('util');
-const WebSocket = require('ws');
-
+const usersController = require('../controllers/users');
+const sessAuthController = require('../controllers/sessAuth');
+const apiAuthController =  require('../controllers/apiAuth');
+const passport = require('passport');
 const eventLogger = require('../lib/EventLogger');
-const spawn = require('child_process').spawn;
 
-const DockerWrapper = require('../lib/DockerWrapper');
-const App = require('../server/models').App;
+// Router middleware
+router.use(middlewares.authentication);
+router.use(middlewares.authorization);
+router.use(middlewares.isAdmin);
 
-const storage = multer.diskStorage({
-  // TODO: validate that the file is a zip
-  destination: (req, file, cb) => {
-    const directoryName = `./tmp/`;
-    cb(null, directoryName);
-  },
-  filename: (req, file, cb) => {
-    cb(null, uuid());
-  }
-});
-
-const upload = multer({storage});
-
-/* GET home page. */
+// Homepage
 router.get('/', function(req, res, next) {
   res.redirect('/apps');
 });
 
+// Authentication
+const authenticator = passport.authenticate('local', { failureRedirect: '/login' });
+router.get('/login', sessAuthController.loginForm);
+router.get('/logout', sessAuthController.logout);
+router.post('/login', authenticator, sessAuthController.login);
+router.post('/api/login', apiAuthController.login);
+
 // Event Streaming
 router.get('/events/:appId', eventLogger.appEvents);
-router.get('/events/:appId/exec', eventLogger.appExecEvents);
+
+// User
+router.get('/users', usersController.list);
+router.get('/users/new', usersController.new);
+router.get('/users/:userId/edit', usersController.edit);
+router.post('/users', usersController.create);
+router.post('/users/:userId/delete', usersController.delete);
+router.post('/users/:userId', usersController.update);
 
 // App
 router.get('/apps', appsController.list);
@@ -42,71 +42,17 @@ router.get('/apps/new', appsController.new);
 router.get('/apps/:appId', appsController.show);
 router.get('/apps/:appId/delete', appsController.delete);
 router.post('/apps', appsController.create);
-router.post('/apps/:appId/deploy', upload.single('file'), appsController.deploy);
-router.post('/apps', upload.single('file'), appsController.create);
+router.post('/apps/:appId/deploy', middlewares.upload().single('file'), appsController.deploy);
+router.post('/apps', middlewares.upload().single('file'), appsController.create);
 router.post('/apps/:appId/delete', appsController.destroy);
-
-// Database
-router.post('/apps/:appId/database', upload.single('file'), appsController.createDatabase);
-
-// Env Variables
+router.post('/apps/:appId/database', middlewares.upload().single('file'), appsController.createDatabase);
 router.post('/apps/:appId/env', appsController.updateEnvVar);
-// Scale/Replicas
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
-router.post('/apps/:appId/exec', (req, res) => {
-  App.findByPk(req.params.appId)
-    .then(async(app) => {
-      const docker = await DockerWrapper.getManagerNodeInstance();
-      const command = req.body.command.split(' ');
-      const image = `${app.title}:latest`; // TODO: Don't hard-code this
-
-      // Create a place to stream command output to, and emit events from
-      // You might think we could just subscribe to the data event on the
-      // stream from Docker run, but the chunks we get from that are weird.
-      // Writing to a file first and tailing the file normalizes the chunks
-      // for some reason.
-      const fileName = app.title + uuid();
-      const outputStream = fs.createWriteStream(fileName);
-      const tail = spawn("tail", ["-f", fileName]);
-      tail.stdout.on('data', data => {
-        fs.readFile(fileName, (err, fileContents) => {
-          if (err) throw err;
-          console.log('read from file');
-          app.emitEvent(fileContents.toString('utf8'), 'exec')
-        });
-      });
-
-      const runOptions =  {
-        Env: [
-          // TODO: These shouldn't be hard-coded... store in db?
-          `DATABASE_HOST=${app.title}_database`,
-          `POSTGRES_USER=postgres`,
-          `POSTGRES_PASSWORD=password`,
-          `POSTGRES_DB=${app.title}`
-        ],
-        "HostConfig": {
-          "NetworkMode": `${app.network}`,
-        },
-      };
-
-      docker.run(image, command, outputStream, runOptions, (err, data, container) => {
-        // Remove one-off container once command terminates
-        container.remove();
-      }).on('stream', stream => {
-        // Clean up after there's no more output coming into our stream
-        stream.on('end', () => {
-          tail.kill();
-          app.emitEvent('===END===');
-          outputStream.end(() => {
-            fs.unlink(fileName, err => { if (err) { throw err } })
-          });
-        });
-      });
-
-      res.send(200, 'OK');
-    })
-    .catch(error => res.status(404).send(error));
-});
+// API
+router.get('/api/apps', appsController.list);
+router.post('/api/apps', appsController.create);
+router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), appsController.deploy);
+router.get('/api/events/:appId', eventLogger.appEvents);
 
 module.exports = router;
