@@ -49,4 +49,10 @@ router.post('/apps/:appId/database', middlewares.upload().single('file'), appsCo
 router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
+// API
+router.get('/api/apps', appsController.list);
+router.post('/api/apps', appsController.create);
+router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), appsController.deploy);
+router.get('/api/events/:appId', eventLogger.appEvents);
+
 module.exports = router;
