@@ -100,7 +100,7 @@ module.exports = {
           if (req.accepts('html')) {
             res.redirect(`/apps/${app.id}?events`);
           } else {
-            res.status(201).json({ stream: `/events/${app.id}` });
+            res.status(201).json({ stream: `/api/events/${app.id}` });
           }
           app.emitEvent(`Deploying application '${app.title}'...`);
           resolve(app);
