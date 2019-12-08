@@ -1,4 +1,12 @@
-<form method="POST" action="/users/{{user.id}}">
-  <h1 class="subtitle">Update User</h1>
-  {{> user-form submitText="Update User" passwordMessage="(Leave blank to keep existing password)" }}
-</form>
+<div class="columns">
+  <div class="column is-half">
+
+    <div class="box">
+
+      <form method="POST" action="/users/{{user.id}}">
+        <h1 class="subtitle">Update User</h1>
+        {{> user-form submitText="Update User" passwordMessage="(Leave blank to keep existing password)" }}
+      </form>
+    </div>
+  </div>
+</div>
