@@ -12,6 +12,7 @@ const eventLogger = require('../lib/EventLogger');
 router.use(middlewares.authentication);
 router.use(middlewares.authorization);
 router.use(middlewares.isAdmin);
+router.use(middlewares.activePage);
 
 // Homepage
 router.get('/', function(req, res, next) {
