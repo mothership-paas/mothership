@@ -92,7 +92,7 @@ app.set('view engine', 'hbs');
 app.engine('.hbs', expressHandlebars({
   extname: '.hbs',
   layoutsDir: './views',
-  defaultLayout: 'layout',
+  defaultLayout: 'layout-internal',
   partialsDir: './views/partials/',
   helpers: require('./lib/HandlebarsHelpers')
 }));
