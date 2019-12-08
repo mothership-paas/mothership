@@ -59,9 +59,9 @@ module.exports = {
   activePage(req, res, next) {
     const path = req.path;
 
-    if (path.indexOf('/users') > -1) {
+    if (path.startsWith('/users')) {
       res.locals.activePage = { users: true };
-    } else if (path.indexOf('/apps') > -1) {
+    } else if (path.startsWith('/apps')) {
       res.locals.activePage = { apps: true };
     }
 
