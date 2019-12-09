@@ -22,7 +22,7 @@ module.exports = {
     if (req.path.match(/^\/users.*/)) {
       try {
         if (req.user && req.user.role === 'admin') {
-          next(); 
+          next();
         } else {
           res.redirect('/apps');
         }
@@ -54,5 +54,17 @@ module.exports = {
     });
 
     return multer({ storage });
-  }
+  },
+
+  activePage(req, res, next) {
+    const path = req.path;
+
+    if (path.startsWith('/users')) {
+      res.locals.activePage = { users: true };
+    } else if (path.startsWith('/apps')) {
+      res.locals.activePage = { apps: true };
+    }
+
+    next();
+  },
 };

@@ -10,38 +10,58 @@
 </article>
 {{/if}}
 
-<div>
-  <label>First name:</label>
-  <input type="text" name="firstname" value="{{user.firstName}}"/>
+<div class="field">
+  <label class="label">First name:</label>
+  <div class="control">
+    <input type="text" class="input" name="firstname" value="{{user.firstName}}"/>
+  </div>
 </div>
-<div>
-  <label>Last name:</label>
-  <input type="text" name="lastname" value="{{user.lastName}}"/>
+<div class="field">
+  <label class="label">Last name:</label>
+  <div class="control">
+    <input type="text" class="input" name="lastname" value="{{user.lastName}}"/>
+  </div>
 </div>
-<div>
-  <label>Email:</label>
-  <input type="text" name="username" value="{{user.username}}"/>
+<div class="field">
+  <label class="label">Email:</label>
+  <div class="control">
+    <input type="text" class="input" name="username" value="{{user.username}}"/>
+  </div>
 </div>
-<div>
-  <label>Password: {{passwordMessage}}</label>
-  <input type="password" name="password"/>
+<div class="field">
+  <label class="label">Password:</label>
+  <div class="control">
+    <input type="password" class="input" name="password"/>
+    <p class="help">{{passwordMessage}}</p>
+  </div>
 </div>
-<div>
-  <input type="radio" id="admin" name="role" value="admin"
-    {{#if isAdmin}}
-    checked
-    {{/if}}
-  >
-  <label for="admin">Admin User</label>
-
-  <input type="radio" id="regular" name="role" value="user"
-    {{#unless isAdmin}}
-    checked
-    {{/unless}}
-  >
-  <label for="regular">Regular User</label>
+<div class="field">
+  <label class="label">User Type:</label>
+  <div class="control">
+    <label class="radio">
+      <input type="radio" id="admin" name="role" value="admin"
+        {{#if isAdmin}}
+        checked
+        {{/if}}
+      >
+      Admin User
+    </label>
+    <label class="radio">
+      <input type="radio" id="regular" name="role" value="user"
+        {{#unless isAdmin}}
+        checked
+        {{/unless}}
+      >
+      Regular User
+    </label>
+  </div>
 </div>
-<div>
-  <button type="submit">{{submitText}}</button>
-  <a href="/users">Cancel</a>
+<hr/>
+<div class="field is-grouped">
+  <p class="control">
+    <button class="button is-link" type="submit">{{submitText}}</button>
+  </p>
+  <p class="control">
+    <a class="button" href="/users">Cancel</a>
+  </p>
 </div>

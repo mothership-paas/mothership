@@ -1,6 +1,6 @@
 module.exports = {
   loginForm(req, res) {
-    res.render('login');
+    res.render('login', { layout: 'layout-external' });
   },
 
   login(req, res) {
