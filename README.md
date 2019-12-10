@@ -1,4 +1,4 @@
-# PaaS
+# Mothership
 
 ## Setup
 
