@@ -7,6 +7,8 @@ var sassMiddleware = require('node-sass-middleware');
 var expressHandlebars = require('express-handlebars');
 const passport = require('passport');
 const session = require('express-session');
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
 const bcrypt = require('bcrypt');
 const Strategy = require('passport-local').Strategy;
 const User = require('./server/models').User;
@@ -78,7 +80,10 @@ passport.deserializeUser(function(id, cb) {
     .catch(err => cb(err));
 });
 
+const redisClient = redis.createClient();
+
 app.use(session({
+  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
