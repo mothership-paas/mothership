@@ -321,7 +321,7 @@ module.exports = {
     });
 
     const docker = await DockerWrapper.getManagerNodeInstance();
-    const dbURI = `postgresql://postgres:password@ticketing2_database/${app.title}`;
+    const dbURI = `postgresql://postgres:password@${app.database.service_name}/${app.title}`;
     const command = ["pg_dump", dbURI];
     const network = await docker.getNetwork(app.network);
     const dumpFile = fs.createWriteStream(path.resolve('tmp') + `/${app.title}.sql`);
