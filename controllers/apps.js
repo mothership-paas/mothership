@@ -3,9 +3,10 @@ const App = require('../server/models').App;
 const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
 
+const fs = require('fs');
+const path = require('path');
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
-const fs = require('fs');
 const rimraf = require('rimraf');
 
 const moveApplicationFile = (req, app) => {
@@ -26,7 +27,7 @@ const destroyAppWithoutDatabase = (app) => {
     DockerWrapper.destroyService(app)
       .then(DockerWrapper.destroyNetwork)
       .then((app) => {
-        App.destroy({  where: { id: app.id } })
+        App.destroy({ where: { id: app.id } })
       })
   });
 }
@@ -226,7 +227,7 @@ module.exports = {
               destroyAppWithoutDatabase(app)
             }
           })
-        })
+      })
       .then(() => res.redirect('/apps'))
       .catch((error) => res.status(400).send(error));
   },
@@ -309,5 +310,41 @@ module.exports = {
         return app;
       })
       .catch(error => console.log(error))
+  },
+
+  async dbDump(req, res) {
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database'
+      }]
+    });
+
+    const docker = await DockerWrapper.getManagerNodeInstance();
+    const dbURI = `postgresql://postgres:password@ticketing2_database/${app.title}`;
+    const command = ["pg_dump", dbURI];
+    const network = await docker.getNetwork(app.network);
+    const dumpFile = fs.createWriteStream(path.resolve('tmp') + `/${app.title}.sql`);
+    console.log(dumpFile.path);
+    const opts = {
+      Image: 'postgres',
+      AttachStdout: false,
+    };
+
+    docker.run('postgres', command, null, opts, (err, data, container) => {
+      dumpFile.end();
+      container.remove();
+
+      res.sendFile(dumpFile.path, function (error) {
+        fs.unlink(dumpFile.path, function () {});
+      });
+    }).on('container', function (container) {
+      network.connect({ Container: container.id });
+    }).on('stream', function (stream) {
+      stream.pipe(dumpFile);
+      stream.pipe(process.stdout);
+    }).on('error', function (error) {
+      console.log(error);
+    });
   },
 };

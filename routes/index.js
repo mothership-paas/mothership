@@ -55,5 +55,6 @@ router.get('/api/apps', appsController.list);
 router.post('/api/apps', appsController.create);
 router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), appsController.deploy);
 router.get('/api/events/:appId', eventLogger.appEvents);
+router.get('/api/apps/:appId/dbdump', appsController.dbDump);
 
 module.exports = router;
