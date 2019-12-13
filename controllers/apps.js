@@ -44,6 +44,14 @@ const destroyAppWithDatabase = (app) => {
   });
 }
 
+const removeDatabaseDir = (app) => {
+  return new Promise((resolve, reject) => {
+    rimraf(`${app.path}/db`, (error) => {
+      error ? reject(error) : resolve(app);
+    });
+  });
+};
+
 module.exports = {
   async create(req, res) {
     const domain = await Config.findOne({
@@ -310,6 +318,54 @@ module.exports = {
         return app;
       })
       .catch(error => console.log(error))
+  },
+
+  async removeFolder(req, res) {
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database',
+      }]
+    });
+
+    removeDatabaseDir(app)
+      .then(() => res.send('ok'))
+      .catch(console.log);
+  },
+
+  async destroyDB(req, res) {
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database',
+      }]
+    });
+
+    const database = app.database;
+
+    DockerWrapper.destroyDatabaseService(app)
+      .then(removeDatabaseDir)
+      .then(async(app) => {
+        await app.update({ databaseId: null });
+
+        database.destroy()
+          .catch(error => {
+            console.log(error);
+            res.status(400).send({ message: 'uh oh' })
+            return;
+          });
+        return app;
+      })
+      .then(app => {
+        setTimeout(() => DockerWrapper.pruneDatabaseVolume(app), 5000);
+        
+        return res.redirect(`/apps/${app.id}`);
+      })
+      .catch(error => {
+        console.log(error);
+        res.status(500).send("Something went wrong! Please try again");
+      });
+
   },
 
   async dbDump(req, res) {
