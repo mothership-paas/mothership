@@ -334,6 +334,7 @@ module.exports = {
   },
 
   async destroyDB(req, res) {
+    console.log('hello');
     const app = await App.findByPk(req.params.appId, {
       include: [{
         model: Database,
@@ -358,8 +359,11 @@ module.exports = {
       })
       .then(app => {
         setTimeout(() => DockerWrapper.pruneDatabaseVolume(app), 5000);
-        
-        return res.redirect(`/apps/${app.id}`);
+        if (req.accepts('html')) {
+          return res.redirect(`/apps/${app.id}`);
+        } else {
+          return res.send({ message: "Database destroyed" });
+        }
       })
       .catch(error => {
         console.log(error);
