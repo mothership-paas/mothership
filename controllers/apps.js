@@ -387,7 +387,6 @@ module.exports = {
     const command = ["pg_dump", dbURI];
     const network = await docker.getNetwork(app.network);
     const dumpFile = fs.createWriteStream(path.resolve('tmp') + `/${app.title}.sql`);
-    console.log(dumpFile.path);
     const opts = {
       Image: 'postgres',
       AttachStdout: false,
