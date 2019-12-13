@@ -131,7 +131,7 @@
           <div class="modal-content">
             <article class="message is-danger">
               <div class="message-header">
-                <p>Danger</p>
+                <p>Are you sure?</p>
               </div>
               <div class="message-body">
                 Are you <em>sure</em>? You will lose this app's entire database and
@@ -352,9 +352,15 @@
     document.addEventListener('DOMContentLoaded', function() {
       const destroyButton = document.getElementById('dbdestroy');
       const destroyModal = document.getElementById('dbdestroy-modal');
+      const cancelButton = document.getElementById('dbdestroy-cancel');
 
       destroyButton.addEventListener('click', function () {
         destroyModal.classList.add('is-active');
+      });
+
+      cancelButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        destroyModal.classList.remove('is-active');
       });
     });
   })();
