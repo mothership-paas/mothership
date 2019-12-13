@@ -320,6 +320,12 @@ module.exports = {
       }]
     });
 
+    if (!app.database) {
+      return res.status(404).send({
+        message: `${app.title} does not have a database`
+      });
+    }
+
     const docker = await DockerWrapper.getManagerNodeInstance();
     const dbURI = `postgresql://postgres:password@${app.database.service_name}/${app.title}`;
     const command = ["pg_dump", dbURI];
