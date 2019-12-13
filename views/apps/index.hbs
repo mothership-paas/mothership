@@ -13,7 +13,7 @@
               <tr>
                 <td>Name</td>
                 <td>URL</td>
-                <td><span class="is-pulled-right">Actions</span></td>
+                <td>Instances</td>
               </tr>
               </thead>
               {{#each apps}}
@@ -26,12 +26,7 @@
                       http://{{url}}
                     </a>
                   </td>
-                  <td>
-                    <div class="buttons are-small is-pulled-right">
-                      <a href="/apps/{{ id }}/edit" class="button is-light">Update</a>
-                      <a href="/apps/{{ id }}/delete" class="button is-danger is-light">Delete</a>
-                    </div>
-                  </td>
+                  <td>{{replicas}}</td>
                 </tr>
               {{/each}}
             </table>
