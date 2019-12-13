@@ -15,17 +15,19 @@ nav.main-nav
   border-right: 1px solid #e9eaeb
   background: #fff
 
-
 nav.main-nav .logo
-  text-align: center
-  padding: 12px 0
   display: flex
   align-items: center
   justify-content: center
-  padding: 20px 0
+  padding: 12px 0
+  border-bottom: 1px solid #eee
+  color: #222
 
 nav.main-nav li
   margin: 8px
+
+nav.main-nav li .fa
+  margin-right: 8px
 
 nav.main-nav li a
   padding: 8px
@@ -58,7 +60,6 @@ table.table td
 .main-section
   flex: 1
   padding-top: 2rem
-  margin: 16px 0
 
 .terminal
   background: #222
@@ -75,6 +76,8 @@ details summary
 
 details[open] summary
   margin-bottom: 1rem
+  border-bottom: 1px solid #eee
+  padding-bottom: 1rem
 
 .build-terminal-complete
   background: #e8f5e9
@@ -97,6 +100,12 @@ details[open] summary
 .flex-float-right
   margin-left: auto
 
+.text-tight
+  letter-spacing: -.05em
+
+.has-text-weight-xbold
+  font-weight: 800
+
 // Hack to make xterm right height
 .terminal.xterm
   height: 408px
@@ -104,6 +113,18 @@ details[open] summary
 // Hack to make modals as wide as xterm
 .modal-content
   width: 720px
+
+// Login Page
+
+#login
+  display: flex
+  align-items: center
+  justify-content: center
+
+#login .box
+  width: 100%
+  max-width: 325px
+
 
 // Mobile
 @media only screen and (max-width: 600px)
@@ -115,11 +136,8 @@ details[open] summary
     border-bottom: 1px solid #ddd
 
   nav.main-nav .logo
-    padding: 16px
+    padding: 12px
     border-right: 1px solid #ddd
-
-  nav.main-nav .logo svg
-    width: 32px !important
 
   nav.main-nav ul
     display: flex

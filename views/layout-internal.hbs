@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.css">
+    <script
+      src="https://kit.fontawesome.com/3340e5c3dd.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+
+    <nav class="main-nav">
+      <a href="/apps" class="logo text-tight is-size-4 has-text-centered has-text-weight-xbold">Mothership</a>
+
+        <ul>
+
+          <li class="{{#if activePage.apps}}is-active{{/if}}" style="">
+            <a href="/apps">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-box"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              <span>Apps</span>
+            </a>
+          </li><li class="">
+            <a href="/cluster">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+              <span>Cluster</span>
+            </a>
+          </li>
+          {{#if userIsAdmin}}
+          <li class="{{#if activePage.users}}is-active{{/if}}">
+            <a href="/users">
+              <i class="fa fa-users"></i>Users
+            </a>
+          </li>
+          {{/if}}
+        </ul>
+
+    </nav>
+
+    <section class="section main-section">
+      <div class="breadcrumb">
+        <ul>
+          <li><a href="/apps">Apps</a></li>
+          {{#if app}}
+            <li class="is-active"><a href="#" aria-current="page">{{app.title}}</a></li>
+          {{/if}}
+        </ul>
+      </div>
+      <div class="container">
+          <div class="columns">
+            <div class="column is-three-quarters">
+              {{{body}}}
+            </div>
+          </div>
+
+        </div>
+    </section>
+
+  </body>
+</html>

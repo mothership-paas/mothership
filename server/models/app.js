@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     filename: DataTypes.STRING,
     network: DataTypes.STRING,
     url: DataTypes.STRING,
+    deployed: DataTypes.DATE,
     envVariables: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: [],
@@ -46,8 +47,17 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   App.prototype.emitStdout = function(data) {
-    const message = JSON.parse(data);
-    if (message.stream) {
+    let message;
+
+    if(data) {
+      try {
+        message = JSON.parse(data);
+      } catch(e) {
+        console.log(e); // error in the above string (in this case, yes)!
+      }
+    }
+
+    if (message && message.stream) {
       eventLogger.emit(`message-${this.id}`, message.stream);
     }
   };
