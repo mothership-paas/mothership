@@ -3,6 +3,7 @@ const router = express.Router();
 const middlewares = require('./middlewares');
 const appsController = require('../controllers/apps');
 const usersController = require('../controllers/users');
+const clusterController = require('../controllers/cluster')
 const sessAuthController = require('../controllers/sessAuth');
 const apiAuthController =  require('../controllers/apiAuth');
 const passport = require('passport');
@@ -49,6 +50,9 @@ router.post('/apps/:appId/delete', appsController.destroy);
 router.post('/apps/:appId/database', middlewares.upload().single('file'), appsController.createDatabase);
 router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
+
+//Cluster
+router.get('/cluster', clusterController.show);
 
 // API
 router.get('/api/apps', appsController.list);
