@@ -7,7 +7,20 @@ const uuid = require('uuid/v4');
 const errHandler = e => console.log(e);
 
 module.exports = {
-	show(req, res) {
-    res.render('cluster');
+  list(req, res) {
+    return Node.findAll()
+      .then(nodes => {
+        if (req.accepts('html')) {
+          res.render('cluster/index', { nodes });
+        } else {
+          res.json({ nodes });
+        }
+      }).catch(error => {
+        if (req.accepts('html')) {
+          res.status(400).send(error);
+        } else {
+          res.status(400).json({ error });
+        }
+      });
   },
 }
