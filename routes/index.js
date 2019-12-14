@@ -52,7 +52,9 @@ router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
 //Cluster
-router.get('/cluster', clusterController.show);
+router.get('/cluster', clusterController.list);
+router.post('/cluster/create', clusterController.create);
+router.post('/cluster/delete', clusterController.delete);
 
 // API
 router.get('/api/apps', appsController.list);
