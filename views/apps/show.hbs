@@ -122,6 +122,39 @@
           variables <code>DATABASE_HOST</code>, <code>POSTGRES_DB</code>,
           <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>. Be sure to
           configure your application to use these environmeent variables to connect.
+        </p>
+        <button id="dbdestroy" class="button is-danger is-small">
+          Destroy Database
+        </button>
+        <div id="dbdestroy-modal" class="modal">
+          <div class="modal-background"></div>
+          <div class="modal-content">
+            <article class="message is-danger">
+              <div class="message-header">
+                <p>Are you sure?</p>
+              </div>
+              <div class="message-body">
+                Are you <em>sure</em>? You will lose this app's entire database and
+                associated data. This is irreversible. Be sure to back up the database
+                first.
+                <form method="POST" action="/apps/{{app.id}}/dbdestroy">
+                  <div class="field is-grouped" style="margin-top: 16px">
+                    <p class="control">
+                      <button type="submit" id="dbdestroy-for-real" class="button is-small is-danger">
+                        Destroy database
+                      </button>
+                    </p>
+                    <p class="control">
+                      <button id="dbdestroy-cancel" class="button is-small is-success">
+                        Cancel
+                      </button>
+                    </p>
+                  </div>
+                </form>
+              </div>
+            </article>
+          </div>
+        </div>
       {{else}}
         <article class="message is-link">
           <div class="message-body">
@@ -315,6 +348,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/attach/attach.js" integrity="sha256-5bwn4N3wNwa0EPpTwE8fJlb6yXRD6MH7r+H86hfFmI8=" crossorigin="anonymous"></script>
 <script>
+  (() => {
+    document.addEventListener('DOMContentLoaded', function() {
+      const destroyButton = document.getElementById('dbdestroy');
+      const destroyModal = document.getElementById('dbdestroy-modal');
+      const cancelButton = document.getElementById('dbdestroy-cancel');
+
+      destroyButton.addEventListener('click', function () {
+        destroyModal.classList.add('is-active');
+      });
+
+      cancelButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        destroyModal.classList.remove('is-active');
+      });
+    });
+  })();
+
   // WebSocket for updating app health
   (() => {
     document.addEventListener('DOMContentLoaded', function() {
