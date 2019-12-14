@@ -3,9 +3,10 @@ const App = require('../server/models').App;
 const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
 
+const fs = require('fs');
+const path = require('path');
 const slugify = require('slugify');
 const uuidv1 = require('uuid/v1');
-const fs = require('fs');
 const rimraf = require('rimraf');
 
 const moveApplicationFile = (req, app) => {
@@ -26,7 +27,7 @@ const destroyAppWithoutDatabase = (app) => {
     DockerWrapper.destroyService(app)
       .then(DockerWrapper.destroyNetwork)
       .then((app) => {
-        App.destroy({  where: { id: app.id } })
+        App.destroy({ where: { id: app.id } })
       })
   });
 }
@@ -42,6 +43,14 @@ const destroyAppWithDatabase = (app) => {
       });
   });
 }
+
+const removeDatabaseDir = (app) => {
+  return new Promise((resolve, reject) => {
+    rimraf(`${app.path}/db`, (error) => {
+      error ? reject(error) : resolve(app);
+    });
+  });
+};
 
 module.exports = {
   async create(req, res) {
@@ -226,7 +235,7 @@ module.exports = {
               destroyAppWithoutDatabase(app)
             }
           })
-        })
+      })
       .then(() => res.redirect('/apps'))
       .catch((error) => res.status(400).send(error));
   },
@@ -309,5 +318,98 @@ module.exports = {
         return app;
       })
       .catch(error => console.log(error))
+  },
+
+  async removeFolder(req, res) {
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database',
+      }]
+    });
+
+    removeDatabaseDir(app)
+      .then(() => res.send('ok'))
+      .catch(console.log);
+  },
+
+  async destroyDB(req, res) {
+    console.log('hello');
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database',
+      }]
+    });
+
+    const database = app.database;
+
+    DockerWrapper.destroyDatabaseService(app)
+      .then(removeDatabaseDir)
+      .then(async(app) => {
+        await app.update({ databaseId: null });
+
+        database.destroy()
+          .catch(error => {
+            console.log(error);
+            res.status(400).send({ message: 'uh oh' })
+            return;
+          });
+        return app;
+      })
+      .then(app => {
+        setTimeout(() => DockerWrapper.pruneDatabaseVolume(app), 5000);
+        if (req.accepts('html')) {
+          return res.redirect(`/apps/${app.id}`);
+        } else {
+          return res.send({ message: "Database destroyed" });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        res.status(500).send("Something went wrong! Please try again");
+      });
+
+  },
+
+  async dbDump(req, res) {
+    const app = await App.findByPk(req.params.appId, {
+      include: [{
+        model: Database,
+        as: 'database'
+      }]
+    });
+
+    if (!app.database) {
+      return res.status(404).send({
+        message: `${app.title} does not have a database`
+      });
+    }
+
+    const docker = await DockerWrapper.getManagerNodeInstance();
+    const dbURI = `postgresql://postgres:password@${app.database.service_name}/${app.title}`;
+    const command = ["pg_dump", dbURI];
+    const network = await docker.getNetwork(app.network);
+    const dumpFile = fs.createWriteStream(path.resolve('tmp') + `/${app.title}.sql`);
+    const opts = {
+      Image: 'postgres',
+      AttachStdout: false,
+    };
+
+    docker.run('postgres', command, null, opts, (err, data, container) => {
+      dumpFile.end();
+      container.remove();
+
+      res.sendFile(dumpFile.path, function (error) {
+        fs.unlink(dumpFile.path, function () {});
+      });
+    }).on('container', function (container) {
+      network.connect({ Container: container.id });
+    }).on('stream', function (stream) {
+      stream.pipe(dumpFile);
+      stream.pipe(process.stdout);
+    }).on('error', function (error) {
+      console.log(error);
+    });
   },
 };
