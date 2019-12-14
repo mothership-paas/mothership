@@ -2,14 +2,6 @@
   <div class="column">
       <h1 class="subtitle">
         {{nodes.length}} nodes
-
-        <form method="POST" action="/cluster/create">
-          <input type="submit" value="Add Node" class="button is-link is-pulled-right"/>
-        </form>
-
-        <form method="POST" action="/cluster/delete">
-          <input type="submit" value="Remove Node" class="button is-link is-pulled-right"/>
-        </form>
       </h1>
 
       {{#if errors}}
