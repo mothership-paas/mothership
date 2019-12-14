@@ -4,18 +4,19 @@ const uuid = require('uuid/v1');
 
 module.exports = {
   authentication(req, res, next) {
-	  if (req.path === '/api/login' || req.path === '/login') {
-	    next();
-	  } else if (req.path.match(/^\/api.*/)) {
-	    passport.authenticate('jwt', { session: false })(req, res, next);
-	  } else {
-	    if (!req.isAuthenticated()) {
-	      return res.redirect('/login');
-	    } else {
-	      next();
-	    }
-	  }
-	},
+    if (req.path === '/api/login' || req.path === '/login') {
+      next();
+    } else if (req.path.match(/^\/api.*/)) {
+      passport.authenticate('jwt', { session: false })(req, res, next);
+    } else {
+      if (!req.isAuthenticated()) {
+        console.log('request not authenticated');
+	return res.redirect('/login');
+      } else {
+	next();
+      }
+    }
+  },
 
   authorization(req, res, next) {
     // users routes require admin priveleges
