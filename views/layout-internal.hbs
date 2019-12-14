@@ -39,12 +39,25 @@
 
     <section class="section main-section">
       <div class="breadcrumb">
+        {{#if activePage.apps}}
         <ul>
           <li><a href="/apps">Apps</a></li>
           {{#if app}}
             <li class="is-active"><a href="#" aria-current="page">{{app.title}}</a></li>
           {{/if}}
         </ul>
+        {{else if activePage.users}}
+        <ul>
+          <li><a href="/users">Users</a></li>
+          {{#if user}}
+            <li class="is-active"><a href="#" aria-current="page">{{user.firstName}} {{user.lastName}}</a></li>
+          {{/if}}
+        </ul>
+        {{else if activePage.cluster}}
+        <ul>
+          <li><a href="/cluster">Cluster</a></li>
+        </ul>
+        {{/if}}
       </div>
       <div class="container">
           <div class="columns">
