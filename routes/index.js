@@ -51,6 +51,10 @@ router.post('/apps/:appId/database', middlewares.upload().single('file'), appsCo
 router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 
+router.get('/wsauth', (req, res) => {
+  res.status(200).send('ok');
+});
+
 //Cluster
 router.get('/cluster', clusterController.show);
 
