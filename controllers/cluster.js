@@ -48,6 +48,11 @@ module.exports = {
     Node.create(nodeParams)
     .then(() => res.redirect('/cluster'))
     .then(DockerWrapper.createMachine(name, DO_TOKEN))
+		.catch(async (err) => {
+			const workerNode = await Node.findOne({ where: { name }});
+			await workerNode.destroy().catch(errHandler);
+			throw err;
+		})
     .then(DockerWrapper.joinSwarm(name))
     .then(async () => {
       const workerNode = await Node.findOne({ where: { name }});
@@ -81,7 +86,7 @@ module.exports = {
 
     const workerNode = workerNodes[0];
 
-    workerNode.update({ active: false })
+		workerNode.update({ active: false })
 			.then(DockerWrapper.workerLeaveSwarm(workerNode.name))
 			.then(DockerWrapper.removeMachine(workerNode.name))    // -- https://github.com/vweevers/node-docker-machine/issues/30
 			.then(() => workerNode.destroy())
