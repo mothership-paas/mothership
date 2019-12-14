@@ -62,4 +62,29 @@ module.exports = {
     .catch(errHandler);
   },
 
+
+  async delete(req, res) {
+    const nodes = await Node.findAll();
+    const workerNodes = nodes.filter(node => node.manager === false);
+    const managerNode = nodes.find(node => node.manager === true);
+    const allNodesActive = nodes.every(node => node.active);          // boolean for whether all nodes are active
+
+    if (!allNodesActive) {
+      const errors = [{ message: 'Node cannot be removed while cluster is updating.' }];
+      return res.render('cluster/index', { errors, nodes });
+    }
+
+    if (workerNodes.length === 0) {
+      const errors = [{ message: 'There are no nodes to remove!' }];
+      return res.render('cluster/index', { errors, nodes });
+    }
+
+    const workerNode = workerNodes[0];
+
+    workerNode.update({ active: false })
+			.then(DockerWrapper.workerLeaveSwarm(workerNode.name))
+			.then(DockerWrapper.removeMachine(workerNode.name))    // -- https://github.com/vweevers/node-docker-machine/issues/30
+			.then(() => workerNode.destroy())
+      .then(() => res.redirect('/cluster'));
+  }
 };
