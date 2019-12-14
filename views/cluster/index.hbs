@@ -24,15 +24,23 @@
               <tr>
                 <td>Name</td>
                 <td>IP Address</td>
+                <td>Active</td>
               </tr>
               </thead>
               {{#each nodes}}
                 <tr>
                   <td>
-                    <a href="/nodes/{{ id }}">{{name}}</a>
+                    {{name}}
                   </td>
                   <td>
                     {{ ip_address }}
+                  </td>
+                  <td>
+                    {{#if active}}
+                    Yes
+                    {{else}}
+                    No
+                    {{/if}}
                   </td>
                 </tr>
               {{/each}}
