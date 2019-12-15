@@ -29,13 +29,12 @@ module.exports = {
     const workerNodes = nodes.filter(node => node.manager === false);
     const managerNode = nodes.find(node => node.manager === true);
     const allNodesActive = nodes.every(node => node.active);
+		const accessToken = req.body.accessToken;
 
     if (!allNodesActive) {
       const errors = [{ message: 'Node cannot be added while cluster is updating.' }];
-      return res.render('cluster/index', { errors, nodes });
+			return res.status(400).send({ errors });
     }
-
-    const DO_TOKEN = ''; // TODO: send from API
 
     const name = `worker-${uuid()}`;
     const nodeParams = {
@@ -46,25 +45,27 @@ module.exports = {
 
     console.log('Creating node in db...');
     Node.create(nodeParams)
-    .then(() => res.redirect('/cluster'))
-    .then(DockerWrapper.createMachine(name, DO_TOKEN))
-		.catch(async (err) => {
-			const workerNode = await Node.findOne({ where: { name }});
-			await workerNode.destroy().catch(errHandler);
-			throw err;
-		})
-    .then(DockerWrapper.joinSwarm(name))
-    .then(async () => {
-      const workerNode = await Node.findOne({ where: { name }});
-      const workerIp   = await DockerWrapper.getNodeIp(name).catch(errHandler);
-      console.log(`Updating db with IP address of worker node (${workerIp})...`);
-      const params = {
-        ip_address: workerIp,
-        active: true,
-      };
-      return workerNode.update(params);
-    })
-    .catch(errHandler);
+    	.then(() => {
+				return res.status(202).send({ message: "Cluster scale started. (This process may take a few moments)" });
+			})
+    	.then(DockerWrapper.createMachine(name, accessToken)) // TODO: This is a user input value. Sanitization?
+			.catch(async (err) => {
+				const workerNode = await Node.findOne({ where: { name }});
+				await workerNode.destroy().catch(errHandler);
+				throw err;
+			})
+	    .then(DockerWrapper.joinSwarm(name))
+	    .then(async () => {
+	      const workerNode = await Node.findOne({ where: { name }});
+	      const workerIp   = await DockerWrapper.getNodeIp(name).catch(errHandler);
+	      console.log(`Updating db with IP address of worker node (${workerIp})...`);
+	      const params = {
+	        ip_address: workerIp,
+	        active: true,
+	      };
+	      return workerNode.update(params);
+	    })
+	    .catch(errHandler);
   },
 
 
@@ -76,20 +77,22 @@ module.exports = {
 
     if (!allNodesActive) {
       const errors = [{ message: 'Node cannot be removed while cluster is updating.' }];
-      return res.render('cluster/index', { errors, nodes });
+			return res.status(400).send({ errors });
     }
 
     if (workerNodes.length === 0) {
       const errors = [{ message: 'There are no nodes to remove!' }];
-      return res.render('cluster/index', { errors, nodes });
+			return res.status(400).send({ errors });
     }
 
     const workerNode = workerNodes[0];
 
 		workerNode.update({ active: false })
+			.then(() => {
+				return res.status(202).send({ message: "Cluster scale started. (This process may take a few moments)" });
+			})
 			.then(DockerWrapper.workerLeaveSwarm(workerNode.name))
 			.then(DockerWrapper.removeMachine(workerNode.name))    // -- https://github.com/vweevers/node-docker-machine/issues/30
 			.then(() => workerNode.destroy())
-      .then(() => res.redirect('/cluster'));
   }
 };
