@@ -54,8 +54,6 @@ router.post('/apps/:appId/dbdestroy', appsController.destroyDB);
 
 //Cluster
 router.get('/cluster', clusterController.list);
-router.post('/cluster/create', clusterController.create);
-router.post('/cluster/delete', clusterController.delete);
 
 // API
 router.get('/api/apps', appsController.list);
@@ -64,5 +62,8 @@ router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), apps
 router.get('/api/events/:appId', eventLogger.appEvents);
 router.get('/api/apps/:appId/dbdump', appsController.dbDump);
 router.post('/api/apps/:appId/dbdestroy', appsController.destroyDB);
+
+router.post('/api/cluster/create', clusterController.create);
+router.post('/api/cluster/delete', clusterController.delete);
 
 module.exports = router;
