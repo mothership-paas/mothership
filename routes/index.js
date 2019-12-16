@@ -50,6 +50,7 @@ router.post('/apps/:appId/delete', appsController.destroy);
 router.post('/apps/:appId/database', middlewares.upload().single('file'), appsController.createDatabase);
 router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
+router.post('/apps/:appId/dbdestroy', appsController.destroyDB);
 
 router.get('/wsauth', (req, res) => {
   res.status(200).send('ok');
@@ -63,5 +64,7 @@ router.get('/api/apps', appsController.list);
 router.post('/api/apps', appsController.create);
 router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), appsController.deploy);
 router.get('/api/events/:appId', eventLogger.appEvents);
+router.get('/api/apps/:appId/dbdump', appsController.dbDump);
+router.post('/api/apps/:appId/dbdestroy', appsController.destroyDB);
 
 module.exports = router;
