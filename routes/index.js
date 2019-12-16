@@ -52,6 +52,10 @@ router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 router.post('/apps/:appId/dbdestroy', appsController.destroyDB);
 
+router.get('/wsauth', (req, res) => {
+  res.status(200).send('ok');
+});
+
 //Cluster
 router.get('/cluster', clusterController.list);
 

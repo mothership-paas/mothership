@@ -10,6 +10,7 @@ module.exports = {
       passport.authenticate('jwt', { session: false })(req, res, next);
     } else {
       if (!req.isAuthenticated()) {
+        console.log('request not authenticated');
 	return res.redirect('/login');
       } else {
 	next();
