@@ -1,0 +1,53 @@
+<div class="columns">
+  <div class="column">
+      <h1 class="subtitle">
+        {{nodes.length}} nodes
+      </h1>
+
+      {{#if errors}}
+        <article class="message is-danger">
+          <div class="message-body">
+            <ul>
+              {{#each errors}}
+                <li>{{this.message}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        </article>
+      {{/if}}
+
+      {{#if nodes.length}}
+        <div class="box">
+          <div class="table-container">
+            <table class="table is-hoverable is-fullwidth">
+              <thead>
+              <tr>
+                <td>Name</td>
+                <td>IP Address</td>
+                <td>Active</td>
+              </tr>
+              </thead>
+              {{#each nodes}}
+                <tr>
+                  <td>
+                    {{name}}
+                  </td>
+                  <td>
+                    {{ ip_address }}
+                  </td>
+                  <td>
+                    {{#if active}}
+                    Yes
+                    {{else}}
+                    No
+                    {{/if}}
+                  </td>
+                </tr>
+              {{/each}}
+            </table>
+          </div>
+        </div>
+      {{/if}}
+
+  </div>
+</div>
