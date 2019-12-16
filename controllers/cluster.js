@@ -95,5 +95,6 @@ module.exports = {
       .then(DockerWrapper.workerLeaveSwarm(workerNode.name))
       .then(DockerWrapper.removeMachine(workerNode.name))    // -- https://github.com/vweevers/node-docker-machine/issues/30
       .then(() => workerNode.destroy())
+      .catch(errHandler);
   }
 };
