@@ -108,11 +108,19 @@ details[open] summary
 
 // Hack to make xterm right height
 .terminal.xterm
-  height: 408px
+  height: 480px
 
 // Hack to make modals as wide as xterm
 .modal-content
-  width: 720px
+  width: calc(720px + 2em)
+
+.modal-background
+  background-color: rgba(10, 10, 10, .50)
+
+#terminal
+  padding: 1em;
+  background-color: #151515;
+  border-radius: 10px;
 
 // Login Page
 
