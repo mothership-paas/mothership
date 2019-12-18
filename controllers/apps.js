@@ -112,7 +112,10 @@ module.exports = {
         });
       })
       .then(DockerWrapper.buildDockerfile(app.filename))
-      .then(DockerWrapper.buildImage)
+      .then(DockerWrapper.buildSecondDockerfile)
+      .then(DockerWrapper.buildPackerImage)
+      .then(DockerWrapper.buildTempAppImage)
+      .then(DockerWrapper.buildFinalAppImage)
       .then((app) => {
         return new Promise(async(resolve, reject) => {
           if (app.deployed) {
