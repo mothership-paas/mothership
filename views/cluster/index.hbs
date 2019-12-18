@@ -1,7 +1,7 @@
 <div class="columns">
   <div class="column">
       <h1 class="subtitle">
-        {{nodes.length}} nodes
+        Nodes
       </h1>
 
       {{#if errors}}
@@ -52,11 +52,33 @@
   </div>
 </div>
 
-<pre>
-Application Instances: 14
-Instances per Node: 7
-</pre>
+<h1 class="subtitle">
+  Cluster Load
+</h1>
 
-<pre>
-Info: We recommend a maximum load of 5 instances per node. You can manage your nodes using the 'mothership cluster-scale' command on the CLI.
-</pre>
+<div class='box'>
+  <div class="table-container">
+    <table class="table is-hoverable is-fullwidth">
+      
+      <tr>
+        <td>Active Nodes</td>
+        <td>{{nodes.length}}</td>
+      </tr>
+      <tr>
+        <td>Application Instances</td>
+        <td>14</td>
+      </tr>
+      <tr>
+        <td>Instances per Node</td>
+        <td>7</td>
+      </tr>
+    </table>
+  </div>
+</div >
+
+<div class='message'>
+  <div class="message-body">
+    <p>Manage nodes using <code>mothership cluster-scale</code> on the command line. We recommend a maximum load of 5 instances per node. </p>
+
+  </div>
+</div>
