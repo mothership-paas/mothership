@@ -13,6 +13,9 @@ services:
       - DB_PASSWORD=password
       - REDIS_HOST=redis
       - SESSION_SECRET=super_secret
+      - MOTHERSHIP_MANAGER_NAME=
+      - MOTHERSHIP_DOMAIN=
+      - MOTHERSHIP_MANAGER_IP=
 
   database:
     image: postgres
