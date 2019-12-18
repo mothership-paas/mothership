@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_USERNAME=postgres
+      - DB_NAME=paas_development
+      - DB_HOST=database
+      - DB_PASSWORD=password
+      - REDIS_HOST=redis
+      - SESSION_SECRET=super_secret
+
+  database:
+    image: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=paas_development
+      - POSTGRES_PASSWORD=password
+
+  redis:
+    image: redis
+
+volumes:
+  db_data:
