@@ -80,7 +80,7 @@ passport.deserializeUser(function(id, cb) {
     .catch(err => cb(err));
 });
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST);
 
 app.use(session({
   store: new RedisStore({ client: redisClient }),
