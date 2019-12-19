@@ -1,4 +1,5 @@
 const DockerWrapper = require('../lib/DockerWrapper');
+const App = require('../server/models').App;
 const Node = require('../server/models').Node;
 const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
@@ -11,7 +12,16 @@ module.exports = {
     return Node.findAll()
       .then(nodes => {
         if (req.accepts('html')) {
-          res.render('cluster/index', { nodes });
+          App.sum('replicas')
+            .then(instances => {
+              
+              // trick to get a decimal rounded to 2
+              const instancesPerNode = 
+                Math.round(instances * 100 / nodes.length) / 100;
+              
+                res.render('cluster/index', 
+                  { nodes, instances, instancesPerNode });
+            });
         } else {
           res.json({ nodes });
         }
