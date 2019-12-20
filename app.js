@@ -16,7 +16,7 @@ const jwt = require('json-web-token');
 
 const env = process.env.NODE_ENV || 'development';
 
-if (env === 'development') {
+if (env === 'development' || 'test') {
   require('dotenv').config();
 }
 
