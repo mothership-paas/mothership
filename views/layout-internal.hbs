@@ -3,37 +3,45 @@
   <head>
     <title>{{ title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Squada+One&display=swap');
+    </style>
     <link rel="stylesheet" href="/stylesheets/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.css">
-    <script
-      src="https://kit.fontawesome.com/3340e5c3dd.js"
-      crossorigin="anonymous"
-    ></script>
   </head>
   <body>
 
     <nav class="main-nav">
-      <a href="/apps" class="logo text-tight is-size-4 has-text-centered has-text-weight-xbold">Mothership</a>
-        <ul>
-          <li class="{{#if activePage.apps}}is-active{{/if}}" style="">
-            <a href="/apps">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-box"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-              <span>Apps</span>
-            </a>
-          </li><li class="{{#if activePage.cluster}}is-active{{/if}}">
-            <a href="/cluster">
-              <i class="fa fa-server"></i>
-              <span>Cluster</span>
-            </a>
-          </li>
-          {{#if userIsAdmin}}
-          <li class="{{#if activePage.users}}is-active{{/if}}">
-            <a href="/users">
-              <i class="fa fa-users"></i>Users
-            </a>
-          </li>
-          {{/if}}
-        </ul>
+      <a href="/apps" class="main-nav-logo">
+        {{> logo }}
+        <span class="main-nav-logo-text">Mothership</span>
+      </a>
+      <ul>
+        <li class="{{#if activePage.apps}}is-active{{/if}}" style="">
+          <a href="/apps">
+            <i class="fa fa-cubes"></i>
+            <span>Apps</span>
+          </a>
+        </li><li class="{{#if activePage.cluster}}is-active{{/if}}">
+          <a href="/cluster">
+            <i class="fa fa-server"></i>
+            <span>Cluster</span>
+          </a>
+        </li>
+        {{#if userIsAdmin}}
+        <li class="{{#if activePage.users}}is-active{{/if}}">
+          <a href="/users">
+            <i class="fa fa-users"></i>Users
+          </a>
+        </li>
+        {{/if}}
+
+        <li class="log-out">
+          <a href="/logout">
+            <i class="fa fa-sign-out"></i> Logout
+          </a>
+        </li>
+      </ul>
     </nav>
 
     <section class="section main-section">
