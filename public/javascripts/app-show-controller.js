@@ -211,10 +211,25 @@ class AppShowController {
     }
   };
 
+  enableSchemaAttach() {
+    const attachSchemaLink = document.querySelector('.attach-schema');
+
+    if (attachSchemaLink) {
+      attachSchemaLink.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        const schemaField = document.querySelector('.schema-field');
+        if (schemaField) {
+          attachSchemaLink.style.display = 'none';
+          schemaField.style.display = 'initial';
+        }
+      });
+    }
+  }
+
   init() {
-    console.log('init');
     this.enableDropdown();
     this.enableFilepickers();
+    this.enableSchemaAttach();
     this.enableDbDestroyButtons();
 
     this.enableAppHealth();
