@@ -4,6 +4,12 @@ const User = require('../server/models').User;
 
 module.exports = {
   login(req, res) {
+    if (!req.body.username || !req.body.password) {
+      return res.status(400).send({
+        message: 'Please supply username and password'
+      });
+    }
+
     User.findAll({ where: { username: req.body.username }, })
       .then(user => {
         user = user[0];
