@@ -126,27 +126,37 @@
 </div>
 
 <!-- App Database -->
+{{#if app.deployed}}
 <div class="box">
+{{else}}
+<div class="box not-yet-deployed">
+{{/if}}
   <details>
     <summary>
-      Database
+      <div>
+        <i class="fa fa-database"></i>
+        Database
+      </div>
       {{#if app.database}}
-        <span class="tag is-rounded is-link is-light flex-float-right">Enabled</span>
+        <span class="tag is-rounded is-link flex-float-right">Enabled</span>
       {{/if}}
     </summary>
 
     <div class="content">
       {{#if app.database}}
-        <p>Your app is using the database <code>{{app.database.service_name}}</code>.</p>
-        <p>
-          Connection details have been set in your application in the environment
-          variables <code>DATABASE_HOST</code>, <code>POSTGRES_DB</code>,
-          <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>. Be sure to
-          configure your application to use these environmeent variables to connect.
-        </p>
-        <button id="dbdestroy" class="button is-danger is-small">
-          Destroy Database
-        </button>
+      <article class="message">
+        <div class="message-body message-body-small">
+          <p>Your app is using the database <code>{{app.database.service_name}}</code>.</p>
+          <p>
+            Connection details have been set in your application in the environment
+            variables <code>DATABASE_HOST</code>, <code>POSTGRES_DB</code>,
+            <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>. Be sure to
+            configure your application to use these environmeent variables to connect.
+          </p>
+          <button id="dbdestroy" class="button is-danger is-small">
+            Destroy Database
+          </button>
+        </div>
         <div id="dbdestroy-modal" class="modal">
           <div class="modal-background"></div>
           <div class="modal-content">
@@ -177,47 +187,49 @@
           </div>
         </div>
       {{else}}
-        <article class="message is-link">
-          <div class="message-body">
+        <article class="message">
+          <div class="message-body message-body-small">
             <p>This application doesn't have a database. You can add a database below.</p>
             <p>
               Once a database has been added, environment variables are available in
-              your application for <code>DB_NAME</code>, <code>DB_NAME</code>,
-              <code>DB_NAME</code>, and <code>DB_NAME</code>. If you'd like, you can
-              initialize your database by uploading a <code>schema.sql</code> file. Or,
-              if you commands for setting up your database and running migrations, you
-              can run them in the commands section below after adding a database.
+              your application for <code>DATABASE_HOST</code>, <code>POSTGRES_DB</code>,
+              <code>POSTGRES_USER</code>, and <code>POSTGRES_PASSWORD</code>.
+            </p>
+            <p>
+              Optionally, you can attach a <code>schema.sql</code> file initialize your database. Or,
+              if you run commands for setting up your database and running migrations, you
+              can do so in the 'Open Console' action in the dropdown at the top.
             </p>
           </div>
         </article>
 
         <form method="POST" action="/apps/{{app.id}}/database" enctype="multipart/form-data">
-          <div class="field">
-            <div id="file-js-sql" class="file is-small has-name">
-              <label class="file-label">
-                <input class="file-input" type="file" name="file">
+          <div class="field is-grouped" style="align-items: center">
 
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
+            <div class="field schema-field flex-float-right" style="display: none; margin-right: .25rem; margin-bottom: 0;">
+              <div id="file-js-sql" class="file is-small has-name">
+                <label class="file-label">
+                  <input class="file-input" type="file" name="file">
+
+                  <span class="file-cta">
+                    <span class="file-icon">
+                      <i class="fa fa-upload"></i>
+                    </span>
+
+                    <span class="file-name">
+                      Add schema.sql file (optional)...
+                    </span>
                   </span>
-
-                  <span class="file-label">
-                    Add schema.sql file (optional)...
-                  </span>
-                </span>
-
-                <span class="file-name">
-                  No file uploaded
-                </span>
-              </label>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="field">
-            <button class="button is-link" type="submit">
-             Add Database
-            </button>
+            <a class="flex-float-right attach-schema" style="margin-right:.5rem;font-size: .85em" href="#">Add schema.sql (optional)</a>
+            <p class="control">
+              <button class="button is-link" type="submit">
+               Add Database
+              </button>
+            </p>
           </div>
       </form>
       {{/if}}
