@@ -247,11 +247,20 @@
 </div>
 
 <!-- Environment Variables -->
+{{#if app.deployed}}
 <div class="box">
+{{else}}
+<div class="box not-yet-deployed">
+{{/if}}
   <details>
-    <summary>Environment Variables
+    <summary>
+      <div>
+        <i class="fa fa-cogs"></i>Environment Variables
+      </div>
       {{#if app.envVariables.length}}
-        <span class="tag is-rounded is-link is-light flex-float-right">{{ app.envVariables.length }}</span>
+        <span class="tag is-rounded is-link flex-float-right">{{ app.envVariables.length }}</span>
+      {{else}}
+        <span class="tag is-rounded is-link flex-float-right">0</span>
       {{/if}}
     </summary>
 
@@ -319,28 +328,46 @@
   </details>
 </div>
 
-<!-- Scaling -->
+<!-- Instances -->
+{{#if app.deployed}}
 <div class="box">
+{{else}}
+<div class="box not-yet-deployed">
+{{/if}}
   <details>
-    <summary>Scaling</summary>
+    <summary>
+      <div>
+        <i class="fa fa-signal"></i>Instances
+      </div>
+      <div class="flex-float-right">
+        <span class="tag is-rounded is-link">{{ app.replicas }}</span>
+      </div>
+    </summary>
 
-    <div class="content">
-      <p>There are currently <strong>{{ app.replicas }}</strong> instance(s) of this app. You can scale the number of instances below.</p>
-    </div>
+    <article class="message">
+      <div class="message-body message-body-small">
+        <p>There are currently <strong>{{ app.replicas }}</strong> instance(s) of this app. You can scale the number of instances below.</p>
+      </div>
+    </article>
 
     <div class="content">
       <form method="POST" action="/apps/{{ app.id }}/scale">
-        <label>
-          Instances: <input type="number" name="scale" value="{{ app.replicas }}" />
-        </label>
 
-        <input class="button is-link" type="submit" value="Update" />
+        <label class="label">Instances</label>
+
+        <div class="field has-addons">
+          <div class="control">
+            <input class="input" type="number" name="scale" value="{{ app.replicas }}" />
+          </div>
+
+          <div class="control">
+            <input class="button is-link" type="submit" value="Update" />
+          </div>
+        </div>
       </form>
     </div>
   </details>
 </div>
-
-<a href="/apps/{{ app.id }}/delete" class="button is-danger is-outlined">Delete App</a>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.js"></script>
