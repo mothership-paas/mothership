@@ -20,16 +20,18 @@
               {{#each users}}
                 <tr>
                   <td>
-                    <a href="/users/{{ id }}/edit">{{firstName}} {{lastName}}</a>
+                    <a href="/users/{{ id }}/edit">
+                      <span class="app-icon">{{ firstChar firstName }}</span>
+                      {{firstName}} {{lastName}}
+                    </a>
                   </td>
                   <td>
                     {{username}}
                   </td>
                   <td>
                     <div class="buttons are-small is-pulled-right">
-                      <a href="/users/{{ id }}/edit" class="button is-light">Update</a>
                       <form method="POST" action="/users/{{id}}/delete">
-                        <button type="submit" class="button is-danger is-light">Delete</button>
+                        <button type="submit" class="button is-danger">Delete</button>
                       </form>
                     </div>
                   </td>
