@@ -215,14 +215,6 @@ table.table th
   flex: 1
   padding-top: 2rem
 
-.terminal
-  background: #222
-  font-family: 'Fira Code', Menlo, monospace
-  color: #fff
-  height: 15rem
-  overflow: auto
-  font-size: 16px
-
 details summary
   font-weight: bold
   display: flex
@@ -238,6 +230,13 @@ details[open] summary
   border-color: $success
   box-shadow: 0 0 .5rem $success
   color: $success
+
+.build-terminal-complete .fa,
+.build-terminal-failed .fa
+  text-shadow: 0 0 2px currentColor
+  color: currentColor
+  margin-left: .5rem
+  font-size: 22px
 
 .build-terminal-failed
   background: $color-off-black
@@ -262,13 +261,17 @@ details[open] summary
   font-weight: 800
 
 // Hack to make xterm right height
+
 .terminal.xterm
-  height: 480px
-  padding: 1.5em
+  padding: 1em 1.5em
   background-color: $color-off-black
-  border: 1px solid $color-brand
-  border-radius: 10px
+  border: 1px solid lighten($color-off-black, 10%)
+
+#terminal-modal .terminal.xterm
+  padding: 1.5em
   box-shadow: 0 0 .5em $color-brand
+  border-color: $color-brand
+  border-radius: 10px
 
 #terminal-modal .modal-content
   overflow: initial

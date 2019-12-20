@@ -148,12 +148,28 @@ class AppShowController {
 
   enableBuildTerminal() {
     const terminalWrapper = document.getElementById('build-terminal');
-    const terminal = document.querySelector('#build-terminal .terminal');
     const url = new URL(document.location.href);
     const urlParams = new URLSearchParams(url.search);
     const showTerminal = urlParams.has('events');
+    let buildTerminal;
 
     if (showTerminal) {
+      buildTerminal = new Terminal({
+        convertEol: true,
+        fontFamily: 'Fira Code',
+        theme: {
+          black: '#252525',
+          red: '#FF443E',
+          brightRed: '#FF443E',
+          green: '#C3D82C',
+          yellow: '#FFC135',
+          blue: '#42A5F5',
+          magenta: '#FF4081',
+          white: '#F5F5F5',
+          foreground: '#A1B0B8',
+          background: '#151515',
+        }
+      });
       const appEventEndpoint = new EventSource(`/events/${this.app.id}`);
 
       const minimizeTerminal = () => {
@@ -167,7 +183,7 @@ class AppShowController {
           minimizeTerminal();
           terminalWrapper
             .querySelector('summary')
-            .innerHTML = '<span class="icon has-text-success"><i class="fas fa-check-circle"></i></span> Build complete!';
+            .innerHTML = '<span class="icon has-text-success"><i class="fa fa-check-circle"></i></span> Build complete!';
 
           const elementsToEnable = document.querySelectorAll('.not-yet-deployed');
           for (let i = 0; i < elementsToEnable.length; i += 1) {
@@ -181,23 +197,25 @@ class AppShowController {
           terminalWrapper.classList.add('build-terminal-failed');
           terminalWrapper
             .querySelector('summary')
-            .innerHTML = '<span class="icon has-text-danger"><i class="fas fa-times-circle"></i></span> Build failed!';
+            .innerHTML = '<span class="icon has-text-danger"><i class="fa fa-times-circle"></i></span> Build failed!';
           return;
         }
 
-        // This only unhides the terminal _if_ we get a message from the server.
-        if (terminalWrapper.style.display !== 'block') { terminalWrapper.style.display = 'block'; }
-
         const message = JSON.parse(event.data);
+        buildTerminal.write(message);
+      };
 
-        terminal.innerHTML += message;
-        terminal.scrollTop = terminal.scrollHeight;
+      const openHandler = () => {
+        // This only unhides the terminal _if_ we get a message from the server.
+        terminalWrapper.style.display = 'block';
+        buildTerminal.open(document.getElementById('xterm-build-terminal'));
       };
 
       const errorHandler = (error) => {
         appEventEndpoint.close();
       };
 
+      appEventEndpoint.addEventListener('open', openHandler);
       appEventEndpoint.addEventListener('message', messageHandler);
       appEventEndpoint.addEventListener('error', errorHandler);
     }
