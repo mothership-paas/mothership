@@ -67,49 +67,59 @@
 <div class="box">
   <div class="content">
     <details open="true">
-      <summary>Deploy</summary>
+      <summary>
+        <div>
+          <i class="fa fa-rocket"></i>Deploy
+        </div>
+      </summary>
       <div class="content">
-        <article class="message is-info">
-          <div class="message-body">
-            To deploy an app, attach a .zip file containing your app&rsquo;s
-            source code and click 'Deploy' &ndash; we&rsquo;ll take care of the
-            rest. Be sure that your zip file does not nest your app files
-            in an extra directory.
-          </div>
-        </article>
-      </div>
-      <div class="content">
-        <p>
-          <form method="POST" action="/apps/{{app.id}}/deploy" enctype="multipart/form-data">
-            <div class="field">
-              <div id="file-js-zip" class="file is-small has-name">
-                <label class="file-label">
-                  <input class="file-input" type="file" name="file">
-
-                  <span class="file-cta">
-                    <span class="file-icon">
-                      <i class="fas fa-upload"></i>
-                    </span>
-
-                    <span class="file-label">
-                      Add .zip file of application...
-                    </span>
-                  </span>
-
-                  <span class="file-name">
-                    No file uploaded
-                  </span>
-                </label>
-              </div>
+        <div class="message-side-by-side">
+          <article class="message">
+            <div class="message-header">
+              Upload .zip
             </div>
+            <div class="message-body message-body-small">
+              <p class="has-info-text">Upload a .zip of your app's code. Be sure the .zip doesn't nest files in an extra directory.</p>
 
-            <div class="field is-grouped">
-              <p class="control flex-float-right">
-                <button class="button is-link" type="submit">Deploy</button>
-              </p>
+              <form method="POST" action="/apps/{{app.id}}/deploy" enctype="multipart/form-data">
+                <div class="field has-addons" style="justify-content: center">
+                  <div class="control">
+                    <div id="file-js-zip" class="file has-name">
+                      <label class="file-label">
+                        <input class="file-input" type="file" name="file">
+
+                        <span class="file-cta">
+                          <span class="file-icon">
+                            <i class="fa fa-file-archive-o" /></i>
+                          </span>
+
+                          <span class="file-name">
+                            Attach .zip...
+                          </span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="control">
+                    <button class="button is-link" type="submit">Deploy</button>
+                  </div>
+                </div>
+              </form>
             </div>
-          </form>
-        </p>
+          </article>
+
+          <span class="message-divider">OR</span>
+
+          <article class="message">
+            <div class="message-header">From Terminal</div>
+
+            <div class="message-body message-body-small">
+              Deploy this app from your terminal using the <a href="" target="_blank">Mothership CLI</a>:
+              <br/><br/>
+              <code class="code-large">mothership deploy redpoint</code>
+            </div>
+          </article>
+        </div>
       </div>
     </details>
   </div>
