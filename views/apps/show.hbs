@@ -237,48 +237,13 @@
   </details>
 </div>
 
-<!-- Command Runner -->
-<div class="box">
-  <details>
-    <summary>Console</summary>
-
-    <div class="content">
-      <form id="exec-form">
-        <p>
-          Run a command in your app and view the output in a console (e.g.
-          <code>rake db:migrate</code>). Interactive commands work too
-          (e.g. <code>bash</code>). Please note that your command runs in
-          a one-off container, so filesystem changes are not persistent.
-        </p>
-        <div class="field has-addons">
-          <div class="control">
-            <input id="command" class="input" type="text" name="command" placeholder="bash">
-          </div>
-
-          <div class="control">
-            <button type="submit" class="button is-info">
-              Run
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <div id="terminal-modal" class="modal">
-        <div class="modal-background"></div>
-        <section class="modal-content">
-          <progress
-            id="terminal-loading"
-            class="progress is-large is-info"
-            style="display: none"
-            max="100"
-          ></progress>
-          <div id="terminal"></div>
-        </section>
-        <button class="modal-close is-large" aria-label="close"></button>
-      </div>
-
-    </div>
-  </details>
+<div id="terminal-modal" class="modal">
+  <div class="modal-background"></div>
+  <section class="modal-content">
+    {{> loading }}
+    <div id="terminal"></div>
+  </section>
+  <button class="modal-close is-large" aria-label="close"></button>
 </div>
 
 <!-- Environment Variables -->
