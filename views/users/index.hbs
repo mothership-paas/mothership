@@ -3,7 +3,7 @@
   <div class="column">
       <h1 class="subtitle">
         Users
-        <a href="/users/new" class="button is-link is-pulled-right">Add User</a>
+        <a href="/users/new" class="button is-primary is-pulled-right">Add User</a>
       </h1>
 
       {{#if users.length}}
@@ -21,7 +21,6 @@
                 <tr>
                   <td>
                     <a href="/users/{{ id }}/edit">
-                      <span class="app-icon">{{ firstChar firstName }}</span>
                       {{firstName}} {{lastName}}
                     </a>
                   </td>
@@ -31,7 +30,7 @@
                   <td>
                     <div class="buttons are-small is-pulled-right">
                       <form method="POST" action="/users/{{id}}/delete">
-                        <button type="submit" class="button is-danger">Delete</button>
+                        <button type="submit" class="button is-danger is-outlined">Delete</button>
                       </form>
                     </div>
                   </td>
