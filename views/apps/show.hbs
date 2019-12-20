@@ -10,6 +10,44 @@
   </article>
 {{/if}}
 
+<div class="app-header" style="display: flex;align-items: center;margin-bottom: 1rem">
+  <h1 class="is-size-4 has-text-weight-bold">{{ app.title }}</h1>
+
+  <span class="tag" id="app-health" style="margin-left: .5rem">Loading...</span>
+
+  {{#if app.deployed}}
+    <a href="http://{{ app.url }}" target="_blank" class="button" style="margin-left: auto">Open App</a>
+  {{else}}
+    <a href="http://{{ app.url }}" target="_blank" class="button not-yet-deployed" style="margin-left: auto">Open App</a>
+  {{/if}}
+
+  {{#if app.deployed}}
+    <div class="dropdown is-right" style="margin-left: 1rem;">
+  {{else}}
+    <div class="dropdown is-right not-yet-deployed" style="margin-left: 1rem;">
+  {{/if}}
+      <div class="dropdown-trigger">
+        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+          <span class="icon is-small">
+            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+          </span>
+        </button>
+      </div>
+      <div class="dropdown-menu" id="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a id="exec-open" href="#" class="dropdown-item">
+            <i class="fa fa-terminal"></i>Open Console
+          </a>
+          <hr class="dropdown-divider">
+          <a href="/apps/{{ app.id }}/delete" class="dropdown-item has-text-danger">
+            <i class="fa fa-trash"></i>Delete App
+          </a>
+        </div>
+      </div>
+    </div>
+
+</div>
+
 <!-- Terminal -->
 <div id="build-terminal" class="box terminal-wrapper" style="display: none">
   <details open="true">
@@ -23,33 +61,6 @@
     </summary>
     <pre class="terminal"></pre>
   </details>
-</div>
-
-<!-- App Info -->
-<div class="box">
-  <div class="content">
-    <details open="true">
-      <summary>Info</summary>
-      <div class="content">
-        <p>
-          <strong>Title:</strong>
-          {{ app.title }}
-        </p>
-
-        <p>
-          <strong>URL:</strong>
-          <a href="http://{{ app.url }}" target="_blank">
-            {{ app.url }}
-          </a>
-        </p>
-
-        <p>
-          <strong>Health:</strong>
-          <span class="tag" id="app-health">Loading...</span>
-        </p>
-      </div>
-    </details>
-  </div>
 </div>
 
 <!-- Deploy -->
