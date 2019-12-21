@@ -70,4 +70,8 @@ router.post('/api/apps/:appId/dbdestroy', appsController.destroyDB);
 router.post('/api/cluster/create', clusterController.create);
 router.post('/api/cluster/delete', clusterController.delete);
 
+router.get('/api/wsauth', (req, res) => {
+  res.status(200).send('ok');
+});
+
 module.exports = router;
