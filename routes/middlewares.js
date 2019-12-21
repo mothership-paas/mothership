@@ -10,6 +10,7 @@ module.exports = {
       passport.authenticate('jwt', { session: false })(req, res, next);
     } else {
       if (!req.isAuthenticated()) {
+        console.log('request not authenticated');
 	return res.redirect('/login');
       } else {
 	next();
@@ -63,6 +64,8 @@ module.exports = {
       res.locals.activePage = { users: true };
     } else if (path.startsWith('/apps')) {
       res.locals.activePage = { apps: true };
+    } else if (path.startsWith('/cluster')) {
+      res.locals.activePage = { cluster: true };
     }
 
     next();

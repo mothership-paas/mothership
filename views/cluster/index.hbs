@@ -1,0 +1,84 @@
+<div class="columns">
+  <div class="column">
+      <h1 class="subtitle">
+        Nodes
+      </h1>
+
+      {{#if errors}}
+        <article class="message is-danger">
+          <div class="message-body">
+            <ul>
+              {{#each errors}}
+                <li>{{this.message}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        </article>
+      {{/if}}
+
+      {{#if nodes.length}}
+        <div class="box">
+          <div class="table-container">
+            <table class="table is-hoverable is-fullwidth">
+              <thead>
+              <tr>
+                <td>Name</td>
+                <td>IP Address</td>
+                <td>Active</td>
+              </tr>
+              </thead>
+              {{#each nodes}}
+                <tr>
+                  <td>
+                    {{name}}
+                  </td>
+                  <td>
+                    {{ ip_address }}
+                  </td>
+                  <td>
+                    {{#if active}}
+                    Yes
+                    {{else}}
+                    No
+                    {{/if}}
+                  </td>
+                </tr>
+              {{/each}}
+            </table>
+          </div>
+        </div>
+      {{/if}}
+
+  </div>
+</div>
+
+<h1 class="subtitle">
+  Cluster Load
+</h1>
+
+<div class='box'>
+  <div class="table-container">
+    <table class="table is-hoverable is-fullwidth">
+      
+      <tr>
+        <td>Nodes</td>
+        <td>{{nodes.length}}</td>
+      </tr>
+      <tr>
+        <td>Application Instances</td>
+        <td>{{ instances }}</td>
+      </tr>
+      <tr>
+        <td>Instances per Node</td>
+        <td>{{ instancesPerNode }}</td>
+      </tr>
+    </table>
+  </div>
+</div >
+
+<div class='message'>
+  <div class="message-body">
+    <p>Manage nodes using <code>mothership cluster-scale</code> on the command line. We recommend a maximum load of 5 instances per node. </p>
+
+  </div>
+</div>

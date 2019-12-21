@@ -52,8 +52,12 @@ router.post('/apps/:appId/env', appsController.updateEnvVar);
 router.post('/apps/:appId/scale', appsController.updateReplicas);
 router.post('/apps/:appId/dbdestroy', appsController.destroyDB);
 
+router.get('/wsauth', (req, res) => {
+  res.status(200).send('ok');
+});
+
 //Cluster
-router.get('/cluster', clusterController.show);
+router.get('/cluster', clusterController.list);
 
 // API
 router.get('/api/apps', appsController.list);
@@ -62,5 +66,12 @@ router.post('/api/apps/:appId/deploy', middlewares.upload().single('file'), apps
 router.get('/api/events/:appId', eventLogger.appEvents);
 router.get('/api/apps/:appId/dbdump', appsController.dbDump);
 router.post('/api/apps/:appId/dbdestroy', appsController.destroyDB);
+
+router.post('/api/cluster/create', clusterController.create);
+router.post('/api/cluster/delete', clusterController.delete);
+
+router.get('/api/wsauth', (req, res) => {
+  res.status(200).send('ok');
+});
 
 module.exports = router;

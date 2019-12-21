@@ -476,7 +476,22 @@
         `ws://localhost:3000/terminal?appTitle={{app.title}}&command=${command}`
       );
 
-      term = new Terminal({ cursorBlink: true });
+      term = new Terminal({
+        cursorBlink: true,
+        fontFamily: 'Fira Code',
+        theme: {
+          black: '#252525',
+          red: '#FF443E',
+          brightRed: '#FF443E',
+          green: '#C3D82C',
+          yellow: '#FFC135',
+          blue: '#42A5F5',
+          magenta: '#FF4081',
+          white: '#F5F5F5',
+          foreground: '#A1B0B8',
+          background: '#151515',
+        }
+      });
 
       websocket.onopen = () => {
         console.log('Connected to test');
