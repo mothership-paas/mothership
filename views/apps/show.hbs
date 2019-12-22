@@ -204,6 +204,24 @@
   </details>
 </div>
 
+<!-- Logs -->
+<div id="log-terminal" class="box terminal-wrapper">
+  <details>
+    <summary>
+      Logs
+    </summary>
+    <div id="xterm-log-terminal"></div>
+    <form>
+      <div class="field">
+        <p class="control">
+          <input type="submit" value="View Logs" class="button is-link" />
+        </p>
+      </div>
+    </form>
+  </details>
+</div>
+
+
 <!-- Command Runner -->
 <div class="box">
   <details>
@@ -389,6 +407,41 @@
         }
         output.innerHTML = event.data;
       }
+    });
+  })();
+
+  // WebSocket for App Logs
+  (() => {
+    document.addEventListener('DOMContentLoaded', function() {
+      const logForm = document.querySelector('#log-terminal form');
+      let logTerminal;
+
+      logForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const websocket = new WebSocket(
+          `ws://${window.location.host}/app-logs?appId={{app.id}}`
+        );
+
+        websocket.onopen = () => {
+          logTerminal = new Terminal({ convertEol: true });
+          logTerminal.open(document.getElementById('xterm-log-terminal'));
+          logForm.querySelector('input').style.display = 'none';
+        };
+        websocket.onerror = (event) => console.log(event.data);
+        websocket.onclose = () => console.log('Disconnected from app-logs');
+        websocket.onmessage = (event) => {
+          // Data is sent back as a Blob, and Safari doesn't
+          // support Blob.prototype.text(), so we wrapt it in
+          // a response object and extract the text from that
+          const response = new Response(event.data);
+          response.text()
+            .then((text) => {
+              logTerminal.write(text)
+            })
+            .catch(console.log);
+        }
+      });
     });
   })();
 

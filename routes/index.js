@@ -71,7 +71,7 @@ router.post('/api/cluster/create', clusterController.create);
 router.post('/api/cluster/delete', clusterController.delete);
 
 router.get('/api/wsauth', (req, res) => {
-  res.status(200).send('ok');
+  res.status(200).json({ message: 'ok' });
 });
 
 module.exports = router;
