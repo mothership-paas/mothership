@@ -38,6 +38,9 @@
           <a id="exec-open" href="#" class="dropdown-item">
             <i class="fa fa-terminal"></i>Open Console
           </a>
+          <a id="logs-open" href="#" class="dropdown-item">
+            <i class="fa fa-file-text-o" aria-hidden="true"></i>View Logs
+          </a>
           <hr class="dropdown-divider">
           <a href="/apps/{{ app.id }}/delete" class="dropdown-item has-text-danger">
             <i class="fa fa-trash"></i>Delete App
@@ -239,9 +242,18 @@
 
 <div id="terminal-modal" class="modal">
   <div class="modal-background"></div>
-  <section class="modal-content">
+  <section class="modal-content modal-content-terminal">
     {{> loading }}
     <div id="terminal"></div>
+  </section>
+  <button class="modal-close is-large" aria-label="close"></button>
+</div>
+
+<div id="log-terminal-modal" class="modal">
+  <div class="modal-background"></div>
+  <section class="modal-content modal-content-terminal">
+    {{> loading }}
+    <div id="log-terminal"></div>
   </section>
   <button class="modal-close is-large" aria-label="close"></button>
 </div>
