@@ -266,14 +266,17 @@ details[open] summary
   background-color: $color-off-black
   border: 1px solid lighten($color-off-black, 10%)
 
-#terminal-modal .terminal.xterm
+.modal-content .terminal.xterm
   padding: 1.5em
   box-shadow: 0 0 .5em $color-brand
   border-color: $color-brand
   border-radius: 10px
 
-#terminal-modal .modal-content
+.modal-content-terminal
   overflow: initial
+
+.modal-content .xterm-viewport
+  border-radius: 8px
 
 // Hack to make modals as wide as xterm
 .modal-content

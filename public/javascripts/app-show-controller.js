@@ -242,6 +242,72 @@ class AppShowController {
         }
       });
     }
+  };
+
+  enableAppLogs() {
+    const logModal = document.getElementById('log-terminal-modal');
+    const logModalBackground = document.querySelector('#log-terminal-modal .modal-background');
+    const logsOpenLink = document.querySelector('#logs-open');
+    const loadingIndicator = logModal.querySelector('.loading-wrapper');
+    const logsModalCloseButton = logModal.querySelector('.modal-close');
+    let logTerminal;
+    let websocket;
+
+    const closeHandler = (event) => {
+      logModal.classList.remove('is-active');
+      websocket.close();
+      document.getElementById('log-terminal').innerHTML = '';
+    };
+
+    logsModalCloseButton.addEventListener('click', closeHandler);
+    logModalBackground.addEventListener('click', closeHandler);
+
+    logsOpenLink.addEventListener('click', (e) => {
+      console.log('logsOpenLink')
+      e.preventDefault();
+      logModal.classList.add('is-active');
+
+      websocket = new WebSocket(
+        `ws://${window.location.host}/app-logs?appId=${this.app.id}`
+      );
+
+      websocket.onopen = () => {
+        logTerminal = new Terminal({
+          convertEol: true,
+          fontFamily: 'Fira Code',
+          theme: {
+            black: '#252525',
+            red: '#FF443E',
+            brightRed: '#FF443E',
+            green: '#C3D82C',
+            yellow: '#FFC135',
+            blue: '#42A5F5',
+            magenta: '#FF4081',
+            white: '#F5F5F5',
+            foreground: '#A1B0B8',
+            background: '#151515',
+          }
+        });
+
+        loadingIndicator.style.display = "none";
+        logTerminal.open(document.getElementById('log-terminal'));
+      };
+
+      websocket.onerror = (event) => console.log(event.data);
+      websocket.onclose = () => console.log('Disconnected from app-logs');
+
+      websocket.onmessage = (event) => {
+        // Data is sent back as a Blob, and Safari doesn't
+        // support Blob.prototype.text(), so we wrapt it in
+        // a response object and extract the text from that
+        const response = new Response(event.data);
+        response.text()
+          .then((text) => {
+            logTerminal.write(text)
+          })
+          .catch(console.log);
+      }
+    });
   }
 
   init() {
@@ -250,6 +316,7 @@ class AppShowController {
     this.enableSchemaAttach();
     this.enableDbDestroyButtons();
 
+    this.enableAppLogs();
     this.enableAppHealth();
     this.enableAppConsole();
     this.enableBuildTerminal();
