@@ -117,9 +117,9 @@
             <div class="message-header">From Terminal</div>
 
             <div class="message-body message-body-small">
-              Deploy this app from your terminal using the <a href="" target="_blank">Mothership CLI</a>:
+              Deploy this app from your terminal using the <a href="https://github.com/unnamed-paas/mothership-cli" target="_blank">Mothership CLI</a>:
               <br/><br/>
-              <code class="code-large">mothership deploy redpoint</code>
+              <code class="code-large">mothership deploy {{app.title}}</code>
             </div>
           </article>
         </div>
@@ -214,13 +214,13 @@
                 <label class="file-label">
                   <input class="file-input" type="file" name="file">
 
-                  <span class="file-cta">
+                  <span class="file-cta" style="padding-right: 0;border-right: 0">
                     <span class="file-icon">
                       <i class="fa fa-upload"></i>
                     </span>
 
                     <span class="file-name">
-                      Add schema.sql file (optional)...
+                      Select schema.sql file...
                     </span>
                   </span>
                 </label>

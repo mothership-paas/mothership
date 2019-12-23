@@ -294,7 +294,10 @@ class AppShowController {
       };
 
       websocket.onerror = (event) => console.log(event.data);
-      websocket.onclose = () => console.log('Disconnected from app-logs');
+      websocket.onclose = () => {
+        loadingIndicator.style.display = "block";
+        console.log('Disconnected from app-logs')
+      };
 
       websocket.onmessage = (event) => {
         // Data is sent back as a Blob, and Safari doesn't
