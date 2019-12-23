@@ -4,10 +4,13 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('paas:server');
-var http = require('http');
-var upgradeToWebSocket = require('../lib/WebSocket');
+const app = require('../app');
+const debug = require('debug')('paas:server');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const upgradeToWebSocket = require('../lib/WebSocket');
+const express = require('express');
 
 /**
  * Get port from environment and store in Express.
