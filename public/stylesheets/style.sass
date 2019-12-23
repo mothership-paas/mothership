@@ -1,7 +1,175 @@
+@import "./font-awesome/css/font-awesome.min.css"
+
+@charset "utf-8"
+
+$color-brand:      #D53A84
+$color-off-black:  #262335
+$color-red:        #F24955
+$color-purple:     #908DFF
+$color-green:      #6DF0DE
+$color-yellow:     #FDD866
+$color-light-gray: #F7F7F7
+
+// Configs (most theming can happen here)
+
+$box-radius: 4px
+$box-shadow: none
+$box-background-color: $color-off-black
+$box-border: 1px solid lighten($color-off-black, 10%)
+
+$body-background-color: darken($color-off-black, 5%)
+
+$hr-background-color: lighten($color-off-black, 25%)
+$hr-height: 2px
+
+$table-background-color: $box-background-color
+$table-color: $color-light-gray
+$table-cell-heading-color: $color-light-gray
+$table-head-cell-color: $color-light-gray
+$table-row-hover-background-color: $color-off-black
+$table-cell-border-color: lighten($color-off-black, 10%)
+$table-cell-padding: .75em .5em
+
+$message-background-color: darken($color-off-black, 5%)
+$message-body-border-width: 0
+$message-header-background-color: transparent
+$message-header-color: $color-light-gray
+$message-header-padding: 2rem 0 0 0
+
+$info: $color-green
+$success: $color-green
+$danger: $color-red
+$primary: $color-brand
+
+$input-color: $color-light-gray
+$input-background-color: darken($color-off-black, 5%)
+$input-border-color: lighten($color-off-black, 10%)
+$input-hover-border-color: lighten($color-off-black, 25%)
+$input-icon-color: lighten($color-off-black, 25%)
+
+$file-cta-background-color: $color-off-black
+$file-radius: 4px 0 0 4px
+
+$file-border-color: lighten($color-off-black, 25%)
+$file-name-border-color: lighten($color-off-black, 25%)
+
+$text: $color-light-gray
+$code-background: lighten($color-off-black, 25%)
+$code: $color-green
+$link: $color-green
+$link-hover: darken($color-purple, 10%)
+$family-primary: 'Roboto', 'system-ui', sans-serif
+$family-code: 'Fira Code', monospace
+$text-strong: $color-light-gray
+
+$sidebar-background-color: $color-off-black
+$sidebar-border-color: lighten($color-off-black, 15%)
+$sidebar-link-color: $color-light-gray
+$sidebar-link-active-color: $color-green
+$sidebar-link-active-background-color: #6df0de2b
+
+$button-background-color: $color-off-black
+$button-border-color: lighten($color-off-black, 25%)
+$button-color: $color-light-gray
+
+$tag-color: $color-off-black
+
+$dropdown-content-background-color: lighten($color-off-black, 10%)
+$dropdown-item-hover-background-color: lighten($color-off-black, 15%)
+$dropdown-item-hover-color: $color-light-gray
+$dropdown-content-padding-bottom:	0
+$dropdown-content-padding-top: 0
+
+// Import Bulma after setting configs
+@import "../../node_modules/bulma/bulma.sass"
+
+.file-name
+  max-width: 11em
+
+.code-large
+  font-size: 1.1em
+
+code
+  border-radius: 4px
+
+.control.has-icons-left .icon,
+.control.has-icons-right .icon
+  transition: 200ms ease all
+
+// TODO: use variables for setting this stuff
+.field.has-addons .file.has-name
+  .file-cta
+    padding-right: 0
+
+  .file-name
+    border-right: 0
+
+  .file-icon
+    margin: 0
+
+.message-side-by-side
+  display: flex
+  flex-wrap: wrap
+
+.message-side-by-side .message
+  margin: 0
+  flex: 1
+
+.message-side-by-side .message-divider
+  margin: 1rem
+  display: flex
+  align-items: center
+  font-weight: bold
+  justify-content: center
+  color: lighten($color-off-black, 25%)
+
+.message-body code,
+.message-body pre
+  background-color: $color-off-black
+
+.message-header
+  justify-content: center
+  font-size: 1.25rem
+  font-weight: 800
+
+.message-side-by-side .message-body
+  text-align: center
+
+.message-body-small
+  font-size: .9em
+
+.dropdown-content
+    background-color: #252335
+    border-radius: 4px
+    box-shadow: 0 0.5em 1em -0.125em #5d5682, 0 0px 0 1px #5d5682
+    padding-bottom: 0
+    padding-top: 0
+    padding: .5rem
+    border: 1px solid #5d5682
+
+.tag:not(body)
+  transition: 300ms ease all
+  box-shadow: none
+
+.tag:not(body).is-success
+  box-shadow: 0 0 0.5rem #6deede
+
+.box
+  border: $box-border
+
+.dropdown-item > .fa
+  margin-right: .5rem
+  display: inline-block
+  width: auto
+
+table.table td,
+.content table td,
+.content table th
+  border-color: $table-cell-border-color
+
 body
   display: flex
   min-height: 100vh
-  background: #f1f2f6
 
 nav
   margin-top: 16px
@@ -12,16 +180,8 @@ nav ul li
 nav.main-nav
   margin: 0
   min-width: 225px
-  border-right: 1px solid #e9eaeb
-  background: #fff
-
-nav.main-nav .logo
-  display: flex
-  align-items: center
-  justify-content: center
-  padding: 12px 0
-  border-bottom: 1px solid #eee
-  color: #222
+  border-right: 1px solid $sidebar-border-color
+  background: $sidebar-background-color
 
 nav.main-nav li
   margin: 8px
@@ -35,11 +195,11 @@ nav.main-nav li a
   width: 100%
   display: flex
   align-items: center
-  color: #777
+  color: $sidebar-link-color
 
 nav.main-nav li.is-active a
-  background: #e0ecfe
-  color: #3273dc
+  background: $sidebar-link-active-background-color
+  color: $sidebar-link-active-color
 
 nav.main-nav li svg
   margin-right: 8px
@@ -50,24 +210,9 @@ table.table td,
 table.table th
   vertical-align: middle
 
-table.table td
-  border-color: #e9eaeb
-
-.box
-  box-shadow: none
-  border: 1px solid #e9eaeb
-
 .main-section
   flex: 1
   padding-top: 2rem
-
-.terminal
-  background: #222
-  font-family: 'Fira Code', Menlo, monospace
-  color: #fff
-  height: 15rem
-  overflow: auto
-  font-size: 16px
 
 details summary
   font-weight: bold
@@ -76,19 +221,27 @@ details summary
 
 details[open] summary
   margin-bottom: 1rem
-  border-bottom: 1px solid #eee
+  border-bottom: 1px solid $hr-background-color
   padding-bottom: 1rem
 
 .build-terminal-complete
-  background: #e8f5e9
-  border-color: #66bb6a
-  box-shadow: 0 0 0 1px #66bb6a
-  color: #1a651d
+  background: $color-off-black
+  border-color: $success
+  box-shadow: 0 0 .5rem $success
+  color: $success
+
+.build-terminal-complete .fa,
+.build-terminal-failed .fa
+  text-shadow: 0 0 2px currentColor
+  color: currentColor
+  margin-left: .5rem
+  font-size: 22px
 
 .build-terminal-failed
-  background: #feecf0
-  border-color: #f14668
-  box-shadow: 0 0 0 1px #f14668
+  background: $color-off-black
+  border-color: $danger
+  box-shadow: 0 0 .5rem $danger
+  color: $danger
 
 .form-list-action-container
   height: 2.5em
@@ -107,8 +260,23 @@ details[open] summary
   font-weight: 800
 
 // Hack to make xterm right height
+
 .terminal.xterm
-  height: 480px
+  padding: 1em 1.5em
+  background-color: $color-off-black
+  border: 1px solid lighten($color-off-black, 10%)
+
+.modal-content .terminal.xterm
+  padding: 1.5em
+  box-shadow: 0 0 .5em $color-brand
+  border-color: $color-brand
+  border-radius: 10px
+
+.modal-content-terminal
+  overflow: initial
+
+.modal-content .xterm-viewport
+  border-radius: 8px
 
 // Hack to make modals as wide as xterm
 .modal-content
@@ -117,10 +285,11 @@ details[open] summary
 .modal-background
   background-color: rgba(10, 10, 10, .50)
 
-#terminal
-  padding: 1em
-  background-color: #151515
-  border-radius: 10px
+.log-out
+  position: fixed
+  font-size: .9em
+  bottom: 0
+  left: 0
 
 // Login Page
 
@@ -128,24 +297,110 @@ details[open] summary
   display: flex
   align-items: center
   justify-content: center
+  flex-direction: column
 
 #login .box
   width: 100%
   max-width: 325px
+  margin-bottom: 2rem
 
+#login .header
+  margin: 1rem 0
+  text-align: center
+  font-family: 'Squada One'
+  text-transform: uppercase
+  font-size: 1.75em
+  color: $color-brand
+
+#login .header .logo
+  width: 100px
+  height: auto
+
+#login .header .logo
+  margin-bottom: -.5rem
+
+.error-page
+  margin-top: 5rem
+
+.error-page h1
+  color: lighten($color-off-black, 15%)
+  font-size: 1.5rem
+  font-weight: bold
+  text-align: center
+
+.error-page h2
+  color: lighten($color-off-black, 25%)
+  font-size: 5rem
+  font-weight: bold
+  text-align: center
+
+.main-nav-logo
+  text-align: center
+  display: flex
+  align-items: center
+  padding: 1.25rem 0
+  justify-content: center
+
+.main-nav-logo .logo
+  height: auto
+  width: 60px
+  color: $color-brand
+
+.main-nav-logo-text
+  font-weight: 800
+  font-size: 1.75em
+  color: $color-brand
+  font-family: 'Squada One'
+  text-transform: uppercase
+
+
+details summary::-webkit-details-marker
+  display: none
+
+details summary .fa
+    margin-right: 1rem
+    color: #5d5682
+    font-size: 1rem
+
+.not-yet-deployed
+  display: none
+
+.app-icon
+  background: #3c3754
+  color: #908DFF
+  padding: 12px
+  border-radius: 4px
+  height: 24px
+  width: 24px
+  font-size: 13px
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  font-weight: bold
+  text-align: center
+  margin-right: .25rem
 
 // Mobile
+@media only screen and (max-width: 1152px)
+  .message-side-by-side .message-divider
+    flex: 100%
+
 @media only screen and (max-width: 600px)
   body
     display: block
 
   nav.main-nav
     display: flex
-    border-bottom: 1px solid #ddd
 
-  nav.main-nav .logo
+  nav.main-nav .main-nav-logo
     padding: 12px
-    border-right: 1px solid #ddd
+    border-right: 1px solid $sidebar-border-color
+
+  nav.main-nav .main-nav-logo-text
+    display: none
+
+  nav.main-nav .main-nav-logo .logo
+    margin: 0
 
   nav.main-nav ul
     display: flex
@@ -154,3 +409,20 @@ details[open] summary
 
   .main-section
     margin: 0
+
+  .log-out
+    position: initial
+
+  .main-section
+    padding-top: 1rem
+
+  .box
+    border-radius: 0
+    margin-left: -1.5rem
+    margin-right: -1.5rem
+    border-left: 0
+    border-right: 0
+
+  table.table td,
+  table.table th
+    white-space: nowrap

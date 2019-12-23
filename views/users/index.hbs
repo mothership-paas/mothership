@@ -3,7 +3,7 @@
   <div class="column">
       <h1 class="subtitle">
         Users
-        <a href="/users/new" class="button is-link is-pulled-right">Add User</a>
+        <a href="/users/new" class="button is-primary is-pulled-right">Add User</a>
       </h1>
 
       {{#if users.length}}
@@ -20,16 +20,17 @@
               {{#each users}}
                 <tr>
                   <td>
-                    <a href="/users/{{ id }}/edit">{{firstName}} {{lastName}}</a>
+                    <a href="/users/{{ id }}/edit">
+                      {{firstName}} {{lastName}}
+                    </a>
                   </td>
                   <td>
                     {{username}}
                   </td>
                   <td>
                     <div class="buttons are-small is-pulled-right">
-                      <a href="/users/{{ id }}/edit" class="button is-light">Update</a>
                       <form method="POST" action="/users/{{id}}/delete">
-                        <button type="submit" class="button is-danger is-light">Delete</button>
+                        <button type="submit" class="button is-danger is-outlined">Delete</button>
                       </form>
                     </div>
                   </td>

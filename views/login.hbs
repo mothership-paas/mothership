@@ -1,17 +1,27 @@
+<div class="header">
+  {{> logo }}
+  <h1>Mothership</h1>
+</div>
+
 <div class="box">
-  <h1 class="text-tight is-size-3 has-text-centered has-text-weight-xbold">Mothership</h1>
   <form action="/login" method="post">
     <div class="field">
       <label class="label">Username</label>
-      <div class="control">
-        <input class="input" type="text" name="username" autofocus/>
+      <div class="control has-icons-left">
+        <input class="input is-medium" type="text" name="username" autofocus/>
+        <span class="icon is-left">
+          <i class="fa fa-user"></i>
+        </span>
       </div>
     </div>
 
     <div class="field">
       <label class="label">Password</label>
-      <div class="control">
-        <input class="input" type="password" name="password"/>
+      <div class="control has-icons-left">
+        <input class="input is-medium" type="password" name="password"/>
+        <span class="icon is-left">
+          <i class="fa fa-lock"></i>
+        </span>
       </div>
     </div>
 
@@ -19,7 +29,7 @@
 
     <div class="field is-grouped is-grouped-centered">
       <div class="control">
-        <input class="button is-link" type="submit" value="Log In"/>
+        <input class="button is-primary" type="submit" value="Log In"/>
       </div>
     </div>
   </form>

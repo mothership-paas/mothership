@@ -2,7 +2,7 @@
   <div class="column">
       <h1 class="subtitle">
         {{apps.length}} app(s)
-        <a href="/apps/new" class="button is-link is-pulled-right">Create App</a>
+        <a href="/apps/new" class="button is-primary is-pulled-right">Create App</a>
       </h1>
 
       {{#if apps.length}}
@@ -19,7 +19,10 @@
               {{#each apps}}
                 <tr>
                   <td>
-                    <a href="/apps/{{ id }}">{{title}}</a>
+                    <a href="/apps/{{ id }}">
+                      <span class="app-icon">{{ firstChar title }}</span>
+                      {{title}}
+                    </a>
                   </td>
                   <td>
                     <a href="http://{{url}}" target="_blank">

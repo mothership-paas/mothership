@@ -58,27 +58,33 @@
 
 <div class='box'>
   <div class="table-container">
-    <table class="table is-hoverable is-fullwidth">
-      
-      <tr>
-        <td>Nodes</td>
-        <td>{{nodes.length}}</td>
-      </tr>
-      <tr>
-        <td>Application Instances</td>
-        <td>{{ instances }}</td>
-      </tr>
-      <tr>
-        <td>Instances per Node</td>
-        <td>{{ instancesPerNode }}</td>
-      </tr>
-    </table>
+    <nav class="level">
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Nodes</p>
+          <p class="title">{{nodes.length}}</p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Application Instances</p>
+          <p class="title">{{ instances }}</p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Instances per Node</p>
+          <p class="title">{{ instancesPerNode }}</p>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <hr/>
+
+  <div class='message'>
+    <div class="message-body">
+      <p>Manage nodes using <code>mothership cluster-scale</code> on the command line. We recommend a maximum load of 5 instances per node. </p>
+    </div>
   </div>
 </div >
-
-<div class='message'>
-  <div class="message-body">
-    <p>Manage nodes using <code>mothership cluster-scale</code> on the command line. We recommend a maximum load of 5 instances per node. </p>
-
-  </div>
-</div>
