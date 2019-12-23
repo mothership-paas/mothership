@@ -33,6 +33,14 @@ const server = https.createServer({
 }, app);
 server.listen(port, () => console.log(`HTTPS server listening: https://localhost`));
 
+// redirect HTTP server
+const httpApp = express();
+httpApp.all('*', (req, res) => {
+  console.log('res.redirect')
+  res.redirect('https://localhost')
+});
+const httpServer = http.createServer(httpApp);
+httpServer.listen(80, () => console.log(`HTTP server listening: http://localhost`));
 
 /**
  * Handle websocket upgrades, pass to appropriate WebSocket Server
