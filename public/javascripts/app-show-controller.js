@@ -14,7 +14,7 @@ class AppShowController {
       return;
     }
 
-    const healthUrl = `ws://${window.location.host}/app-health?appId=${this.app.id}`;
+    const healthUrl = `wss://${window.location.host}/app-health?appId=${this.app.id}`;
     const websocket = new WebSocket(healthUrl);
 
     websocket.onopen = () => console.log('Connected to app-health');
@@ -71,7 +71,7 @@ class AppShowController {
       terminalModal.classList.add('is-active');
 
       websocket = new WebSocket(
-        `ws://localhost:3000/terminal?appTitle=${this.app.title}&command=bash`
+        `wss://${window.location.host}/terminal?appTitle=${this.app.title}&command=bash`
       );
 
       term = new Terminal({
@@ -268,7 +268,7 @@ class AppShowController {
       logModal.classList.add('is-active');
 
       websocket = new WebSocket(
-        `ws://${window.location.host}/app-logs?appId=${this.app.id}`
+        `wss://${window.location.host}/app-logs?appId=${this.app.id}`
       );
 
       websocket.onopen = () => {
