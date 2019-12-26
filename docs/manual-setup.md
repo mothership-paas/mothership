@@ -48,11 +48,20 @@ docker-machine create --driver digitalocean --digitalocean-access-token YOUR_DO_
 ## 5. Set up Docker Swarm
 
 ```
+docker-machine ip mothership-swarm
+```
+
+Take note of this IP address.
+
+```
 eval $(docker-machine env mothership-swarm)
 ```
+
 ```
-docker swarm init --advertise-addr 68.183.149.75
+docker swarm init --advertise-addr YOUR_MOTHERSHIP_SWARM_IP
 ```
+(`YOUR_MOTHERSHIP_SWARM_IP` should be the IP address from the `docker-machine ip` command)
+
 ```
 docker network create --driver overlay proxy
 ```
@@ -94,7 +103,6 @@ docker-machine ip mothership-swarm
 ```
 (Note the result of this command)
 
-
 You'll now need to add a couple of resource records to your DNS provider:
 
 | Name | Type | Value |
@@ -107,7 +115,7 @@ You'll now need to add a couple of resource records to your DNS provider:
 
 ## 7. SSL
 
-Install [Certbot](https://certbot.eff.org/instructions) (If you used `docker-machine` to create the server, use the instructions for Ubuntu)
+Install [Certbot](https://certbot.eff.org/instructions) (If you used `docker-machine` to create the server, use the [instructions for Ubuntu](https://certbot.eff.org/lets-encrypt/ubuntuxenial-other))
 
 For this walkthrough, we'll use Certbot in standalone mode.
 
@@ -132,11 +140,13 @@ The paths for these files will be needed when starting Mothership for the first 
 Create a `docker-compose.yml` file on the Mothership server with the following content.
 
 * For `MOTHERSHIP_DOMAIN` fill in your domain **without** any subdomains (`example.com`).
-* For `MOTHERSHIP_MANAGER_IP` fill in the IP address of the Mothership Swarm Manager from **Step 6**.
+* For `MOTHERSHIP_MANAGER_IP` fill in the IP address of the Mothership Swarm Manager (`docker-machine ip mothership-swarm`).
 * For `SSL_KEY_PATH`, `SSL_CERT_PATH`, and `SSL_CA_PATH` add the paths for the files from **Step 7**.
   * (It's likely you only need to replace the `YOUR_DOMAIN` bit if you used Certbot)
 
 ```yml
+version: '3'
+
 services:
   web:
     image: mothershippaas/mothership:latest
