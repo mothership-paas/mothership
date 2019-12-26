@@ -13,6 +13,6 @@ COPY . /usr/src/app/
 
 RUN yarn install
 
-EXPOSE 443
+EXPOSE 443 80
 
 CMD ["yarn", "start"]
