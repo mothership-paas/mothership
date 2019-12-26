@@ -11,36 +11,41 @@ const https = require('https');
 const fs = require('fs');
 const upgradeToWebSocket = require('../lib/WebSocket');
 const express = require('express');
+let server;
+let httpServer;
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-// const server = https.createServer(app);
+if (process.env.SSL) { // If SSL enabled
+  // Create HTTPS server
+  server = https.createServer({
+    key: fs.readFileSync(process.env.SSL_KEY_PATH),
+    cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+    ca: fs.readFileSync(process.env.SSL_CA_PATH),
+  }, app);
+  server.listen(port, () => console.log(`HTTPS server listening: https://localhost`));
 
-// HTTPS server
-const server = https.createServer({
-  key: fs.readFileSync(process.env.SSL_KEY_PATH),
-  cert: fs.readFileSync(process.env.SSL_CERT_PATH),
-  ca: fs.readFileSync(process.env.SSL_CA_PATH),
-}, app);
-server.listen(port, () => console.log(`HTTPS server listening: https://localhost`));
-
-// redirect HTTP server
-const httpApp = express();
-httpApp.all('*', (req, res) => {
-  console.log('res.redirect')
-  res.redirect('https://localhost')
-});
-const httpServer = http.createServer(httpApp);
-httpServer.listen(80, () => console.log(`HTTP server listening: http://localhost`));
+  // Create HTTP server for redirects
+  const httpApp = express();
+  httpApp.all('*', (req, res) => {
+    console.log('http request, res.redirect')
+    res.redirect('https://localhost' + ':' + port)
+  });
+  httpServer = http.createServer(httpApp);
+  httpServer.listen(80, () => console.log(`HTTP server listening: http://localhost`));
+} else { // If SSL NOT enabled
+  server = http.createServer(app);
+  server.listen(port);
+}
 
 /**
  * Handle websocket upgrades, pass to appropriate WebSocket Server
