@@ -139,7 +139,7 @@ Create a `docker-compose.yml` file on the Mothership server with the following c
 ```yml
 services:
   web:
-    image: jkulton/paas:latest
+    image: mothershippaas/mothership:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /root/.docker:/root/.docker
