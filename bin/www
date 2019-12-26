@@ -38,7 +38,7 @@ if (process.env.SSL) { // If SSL enabled
   const httpApp = express();
   httpApp.all('*', (req, res) => {
     console.log('http request, res.redirect')
-    res.redirect('https://localhost' + ':' + port)
+    res.redirect(`https://${req.hostname}:${port}`)
   });
   httpServer = http.createServer(httpApp);
   httpServer.listen(80, () => console.log(`HTTP server listening: http://localhost`));
