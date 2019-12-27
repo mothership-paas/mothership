@@ -4,6 +4,7 @@ const Node = require('../server/models').Node;
 const Database = require('../server/models').Database;
 const Config = require('../server/models').Config;
 const Machine = require('docker-machine');
+const Sequelize = require('sequelize');
 const uuid = require('uuid/v4');
 const errHandler = e => console.log(e);
 
@@ -12,15 +13,21 @@ module.exports = {
     return Node.findAll()
       .then(nodes => {
         if (req.accepts('html')) {
-          App.sum('replicas')
-            .then(instances => {
-              
-              // trick to get a decimal rounded to 2
+          App
+            .findAll()
+            .then(apps => {
+              const instances = 
+                Array
+                  .from(apps)
+                  .filter(el => el.deployed !== null)
+                  .map(el => el.replicas)
+                  .reduce((a, b) => a + b)
+
               const instancesPerNode = 
                 Math.round(instances * 100 / nodes.length) / 100;
               
-                res.render('cluster/index', 
-                  { nodes, instances, instancesPerNode });
+              res.render('cluster/index', 
+                { nodes, instances, instancesPerNode });
             });
         } else {
           res.json({ nodes });
