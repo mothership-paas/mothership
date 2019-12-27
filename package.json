@@ -43,8 +43,7 @@
     "tar-fs": "^2.0.0",
     "uuid": "^3.3.3",
     "ws": "^7.2.0",
-    "xterm": "^4.2.0-vscode1",
-    "xterm-webfont": "^2.0.0"
+    "xterm": "^4.2.0-vscode1"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
