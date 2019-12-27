@@ -78,7 +78,6 @@ class AppShowController {
 
       term = new Terminal({
         cursorBlink: true,
-        fontFamily: 'Fira Code',
         theme: {
           black: '#252525',
           red: '#FF443E',
@@ -90,6 +89,7 @@ class AppShowController {
           white: '#F5F5F5',
           foreground: '#A1B0B8',
           background: '#151515',
+          fontFamily: 'Fira Code',
         }
       });
 
@@ -158,7 +158,6 @@ class AppShowController {
     if (showTerminal) {
       buildTerminal = new Terminal({
         convertEol: true,
-        fontFamily: 'Fira Code',
         theme: {
           black: '#252525',
           red: '#FF443E',
@@ -170,6 +169,7 @@ class AppShowController {
           white: '#F5F5F5',
           foreground: '#A1B0B8',
           background: '#151515',
+          fontFamily: 'Fira Code',
         }
       });
       const appEventEndpoint = new EventSource(`/events/${this.app.id}`);
@@ -276,7 +276,6 @@ class AppShowController {
       websocket.onopen = () => {
         logTerminal = new Terminal({
           convertEol: true,
-          fontFamily: 'Fira Code',
           theme: {
             black: '#252525',
             red: '#FF443E',
@@ -288,6 +287,7 @@ class AppShowController {
             white: '#F5F5F5',
             foreground: '#A1B0B8',
             background: '#151515',
+            fontFamily: 'Fira Code',
           }
         });
 
