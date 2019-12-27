@@ -21,7 +21,7 @@ module.exports = {
                   .from(apps)
                   .filter(el => el.deployed !== null)
                   .map(el => el.replicas)
-                  .reduce((a, b) => a + b)
+                  .reduce((a, b) => a + b, 0)
 
               const instancesPerNode = 
                 Math.round(instances * 100 / nodes.length) / 100;
