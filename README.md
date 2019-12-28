@@ -1,4 +1,4 @@
-# Mothership
+![Mothership](https://imgur.com/6InUcxa.png)
 
 ## Setup
 
