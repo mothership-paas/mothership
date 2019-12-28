@@ -9,9 +9,9 @@
 
 ---
 
-## 1. Create a server for Mothership using docker-machine
+## 1. Create a server for Mothership
 
-```
+```console
 docker-machine create --driver digitalocean --digitalocean-access-token YOUR_DO_ACCESS_TOKEN mothership-paas
 ```
 
@@ -19,18 +19,18 @@ _(command may differ for another IaaS provider, refer to docker-machine docs for
 
 ## 2. SSH into 'mothership-paas'
 
-```
+```console
 docker-machine ssh mothership-paas
 ```
 
 ## 3. Install docker-compose and docker-machine
 
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```console
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-```
+```console
 base=https://github.com/docker/machine/releases/download/v0.16.2 &&
 curl -L $base/docker-machine-$(uname -s)-$(uname -m) >/tmp/docker-machine &&
 sudo mv /tmp/docker-machine /usr/local/bin/docker-machine &&
@@ -41,31 +41,31 @@ chmod +x /usr/local/bin/docker-machine
 
 **While still SSHed into the Mothership Server** issue the following command
 
-```
+```console
 docker-machine create --driver digitalocean --digitalocean-access-token YOUR_DO_ACCESS_TOKEN mothership-swarm
 ```
 
 ## 5. Set up Docker Swarm
 
-```
+```console
 docker-machine ip mothership-swarm
 ```
 
 Take note of this IP address.
 
-```
+```console
 eval $(docker-machine env mothership-swarm)
 ```
 
-```
+```console
 docker swarm init --advertise-addr YOUR_MOTHERSHIP_SWARM_IP
 ```
 (`YOUR_MOTHERSHIP_SWARM_IP` should be the IP address from the `docker-machine ip` command)
 
-```
+```console
 docker network create --driver overlay proxy
 ```
-```
+```console
 docker service create --name swarm-listener \
 --network proxy \
 --mount "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock" \
@@ -74,7 +74,7 @@ docker service create --name swarm-listener \
 --constraint 'node.role==manager' \
 dockerflow/docker-flow-swarm-listener
 ```
-```
+```console
 docker service create --name proxy \
 -p 80:80 \
 -p 443:443 \
@@ -82,7 +82,7 @@ docker service create --name proxy \
 -e LISTENER_ADDRESS=swarm-listener \
 dockerflow/docker-flow-proxy
 ```
-```
+```console
 eval $(docker-machine env -u)
 ```
 
@@ -90,7 +90,7 @@ eval $(docker-machine env -u)
 
 Get the IP address of the **Mothership server**
 
-```
+```console
 dig +short myip.opendns.com @resolver1.opendns.com
 ```
 
@@ -98,7 +98,7 @@ dig +short myip.opendns.com @resolver1.opendns.com
 
 Get the IP address of the **Mothership swarm manager**
 
-```
+```console
 docker-machine ip mothership-swarm
 ```
 (Note the result of this command)
@@ -121,13 +121,13 @@ For this walkthrough, we'll use Certbot in standalone mode.
 
 **When asked what domain you'd like to get the cert for answer in the format `mothership.YOUR_DOMAIN`**. (e.g. if you'd like to deploy Mothership on `example.com` you'd answer with `mothership.example.com`)
 
-```
+```console
 sudo certbot certonly --standalone
 ```
 
 Follow the prompts for the command. Once Certbot finishes, take note of the location of the cert, key, and chain. They should look something like this:
 
-```
+```console
 /etc/letsencrypt/live/mothership.YOUR_DOMAIN/privkey.pem
 /etc/letsencrypt/live/mothership.YOUR_DOMAIN/cert.pem
 /etc/letsencrypt/live/mothership.YOUR_DOMAIN/chain.pem
@@ -193,13 +193,13 @@ volumes:
 
 After creating and fill the `docker-compose.yml` file with your appropriate values, start the server:
 
-```
+```console
 docker-compose up -d
 ```
 
 Next, migrate and seed the database:
 
-```
+```console
 docker-compose run web ./node_modules/.bin/sequelize db:migrate
 docker-compose run web ./node_modules/.bin/sequelize db:seed:all
 ```
@@ -209,7 +209,7 @@ docker-compose run web ./node_modules/.bin/sequelize db:seed:all
 * Your Mothership should now be live and ready to use!
 * You should log in to your Mothership and change the default admin username/password:
 
-```
+```yml
 username: admin@mothership.live
 password: m0th3rsh1p
 ```
