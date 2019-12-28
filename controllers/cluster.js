@@ -12,15 +12,21 @@ module.exports = {
     return Node.findAll()
       .then(nodes => {
         if (req.accepts('html')) {
-          App.sum('replicas')
-            .then(instances => {
-              
-              // trick to get a decimal rounded to 2
+          App
+            .findAll()
+            .then(apps => {
+              const instances = 
+                Array
+                  .from(apps)
+                  .filter(el => el.deployed !== null)
+                  .map(el => el.replicas)
+                  .reduce((a, b) => a + b, 0)
+
               const instancesPerNode = 
                 Math.round(instances * 100 / nodes.length) / 100;
               
-                res.render('cluster/index', 
-                  { nodes, instances, instancesPerNode });
+              res.render('cluster/index', 
+                { nodes, instances, instancesPerNode });
             });
         } else {
           res.json({ nodes });
