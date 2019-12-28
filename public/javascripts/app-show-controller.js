@@ -5,6 +5,8 @@ class AppShowController {
       title: title,
       deployed: deployed
     };
+    this.sslEnabled = (window.location && window.location.protocol === 'https:');
+    this.websocketProtocol = this.sslEnabled ? 'wss:' : 'ws:';
   };
 
   enableAppHealth() {
@@ -14,7 +16,7 @@ class AppShowController {
       return;
     }
 
-    const healthUrl = `ws://${window.location.host}/app-health?appId=${this.app.id}`;
+    const healthUrl = `${this.websocketProtocol}//${window.location.host}/app-health?appId=${this.app.id}`;
     const websocket = new WebSocket(healthUrl);
 
     websocket.onopen = () => console.log('Connected to app-health');
@@ -71,7 +73,7 @@ class AppShowController {
       terminalModal.classList.add('is-active');
 
       websocket = new WebSocket(
-        `ws://localhost:3000/terminal?appTitle=${this.app.title}&command=bash`
+        `${this.websocketProtocol}//${window.location.host}/terminal?appTitle=${this.app.title}&command=bash`
       );
 
       term = new Terminal({
@@ -268,7 +270,7 @@ class AppShowController {
       logModal.classList.add('is-active');
 
       websocket = new WebSocket(
-        `ws://${window.location.host}/app-logs?appId=${this.app.id}`
+        `${this.websocketProtocol}//${window.location.host}/app-logs?appId=${this.app.id}`
       );
 
       websocket.onopen = () => {
