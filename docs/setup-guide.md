@@ -1,4 +1,4 @@
-# Manual Setup
+# Setup Guide
 
 ## Prerequisites
 
