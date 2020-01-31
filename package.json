@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "start:dev": "nodemon ./bin/www",
     "migrate:reset": "sequelize db:migrate:undo:all && sequelize db:migrate",
-    "test": "NODE_ENV=test jest --setTimeout=10000 --detectOpenHandles",
+    "test": "NODE_ENV=test jest --detectOpenHandles",
     "pretest": "NODE_ENV=test yarn run migrate:reset"
   },
   "dependencies": {
