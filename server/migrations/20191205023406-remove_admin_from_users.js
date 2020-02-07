@@ -9,7 +9,7 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn(
+    return queryInterface.addColumn(
       'Users',
       'isAdmin',
       Sequelize.BOOLEAN

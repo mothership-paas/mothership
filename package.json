@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "start:dev": "nodemon ./bin/www"
+    "start:dev": "nodemon ./bin/www",
+    "migrate:reset": "sequelize db:migrate:undo:all && sequelize db:migrate",
+    "test": "NODE_ENV=test jest --detectOpenHandles",
+    "pretest": "NODE_ENV=test yarn run migrate:reset"
   },
   "dependencies": {
     "bcrypt": "^3.0.7",
@@ -46,6 +49,14 @@
     "xterm": "^4.2.0-vscode1"
   },
   "devDependencies": {
-    "nodemon": "^1.19.4"
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.4",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules"
+    ]
   }
 }

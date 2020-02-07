@@ -1,7 +1,7 @@
 // We need to require dotenv here because sequelize uses this file
 // without the context of our app, which normally already would have
 // used dotenv to set up environment variables
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
   require('dotenv').config();
 }
 
@@ -15,7 +15,7 @@ module.exports = {
     port: 5432,
   },
   "test": {
-    database: process.env.DB_NAME,
+    database: process.env.TEST_DB_NAME,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST,
