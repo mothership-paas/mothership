@@ -10,7 +10,7 @@
     "pretest": "NODE_ENV=test yarn run migrate:reset"
   },
   "dependencies": {
-    "bcrypt": "^3.0.7",
+    "bcrypt": "^5.0.0",
     "bulma": "^0.8.0",
     "connect-redis": "^4.0.3",
     "cookie-parser": "~1.4.4",
